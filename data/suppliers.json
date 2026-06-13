@@ -1,0 +1,478 @@
+[
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-001",
+    "name": "NordStahl GmbH",
+    "branche": "Metallverarbeitung",
+    "land_iso2": "AT",
+    "land_m49": 40,
+    "land_name": "Österreich",
+    "hs_code": "72",
+    "ware": "Eisen und Stahl",
+    "handelsvolumen_eur_jahr": 1850000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 12,
+      "sanktions_exposure": 2,
+      "handels_exposure": 10
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-002",
+    "name": "AlpenTextil AG",
+    "branche": "Textil",
+    "land_iso2": "AT",
+    "land_m49": 40,
+    "land_name": "Österreich",
+    "hs_code": "61",
+    "ware": "Textilien (gewirkt)",
+    "handelsvolumen_eur_jahr": 620000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 12,
+      "sanktions_exposure": 2,
+      "handels_exposure": 10
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-003",
+    "name": "Donau Kunststoff KG",
+    "branche": "Kunststoff",
+    "land_iso2": "AT",
+    "land_m49": 40,
+    "land_name": "Österreich",
+    "hs_code": "39",
+    "ware": "Kunststoffe",
+    "handelsvolumen_eur_jahr": 430000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 12,
+      "sanktions_exposure": 2,
+      "handels_exposure": 10
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-004",
+    "name": "Rheinland Maschinenbau",
+    "branche": "Maschinenbau",
+    "land_iso2": "DE",
+    "land_m49": 276,
+    "land_name": "Deutschland",
+    "hs_code": "84",
+    "ware": "Maschinen / Anlagen",
+    "handelsvolumen_eur_jahr": 3200000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 15,
+      "sanktions_exposure": 3,
+      "handels_exposure": 12
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-005",
+    "name": "Bayern Elektronik GmbH",
+    "branche": "Elektronik",
+    "land_iso2": "DE",
+    "land_m49": 276,
+    "land_name": "Deutschland",
+    "hs_code": "85",
+    "ware": "Elektrotechnik / Bauteile",
+    "handelsvolumen_eur_jahr": 2750000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 15,
+      "sanktions_exposure": 3,
+      "handels_exposure": 12
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-006",
+    "name": "Hanse Chemie SE",
+    "branche": "Chemie",
+    "land_iso2": "DE",
+    "land_m49": 276,
+    "land_name": "Deutschland",
+    "hs_code": "29",
+    "ware": "Organische Chemikalien",
+    "handelsvolumen_eur_jahr": 1900000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 15,
+      "sanktions_exposure": 3,
+      "handels_exposure": 12
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-007",
+    "name": "Milano Tessuti S.p.A.",
+    "branche": "Textil",
+    "land_iso2": "IT",
+    "land_m49": 380,
+    "land_name": "Italien",
+    "hs_code": "62",
+    "ware": "Textilien (konfektioniert)",
+    "handelsvolumen_eur_jahr": 880000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 30,
+      "sanktions_exposure": 4,
+      "handels_exposure": 18
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-008",
+    "name": "Adriatica Macchine srl",
+    "branche": "Maschinenbau",
+    "land_iso2": "IT",
+    "land_m49": 380,
+    "land_name": "Italien",
+    "hs_code": "84",
+    "ware": "Maschinen / Anlagen",
+    "handelsvolumen_eur_jahr": 540000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 30,
+      "sanktions_exposure": 4,
+      "handels_exposure": 18
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-009",
+    "name": "Wisla Components Sp.z.o.o.",
+    "branche": "Elektronik",
+    "land_iso2": "PL",
+    "land_m49": 616,
+    "land_name": "Polen",
+    "hs_code": "85",
+    "ware": "Elektrotechnik / Bauteile",
+    "handelsvolumen_eur_jahr": 710000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 34,
+      "sanktions_exposure": 5,
+      "handels_exposure": 22
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-010",
+    "name": "Krakow Stahlwerk",
+    "branche": "Metallverarbeitung",
+    "land_iso2": "PL",
+    "land_m49": 616,
+    "land_name": "Polen",
+    "hs_code": "72",
+    "ware": "Eisen und Stahl",
+    "handelsvolumen_eur_jahr": 960000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 34,
+      "sanktions_exposure": 5,
+      "handels_exposure": 22
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-011",
+    "name": "Anadolu Tekstil A.S.",
+    "branche": "Textil",
+    "land_iso2": "TR",
+    "land_m49": 792,
+    "land_name": "Türkei",
+    "hs_code": "61",
+    "ware": "Textilien (gewirkt)",
+    "handelsvolumen_eur_jahr": 1240000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 66,
+      "sanktions_exposure": 28,
+      "handels_exposure": 48
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-012",
+    "name": "Bosporus Metal Ltd.",
+    "branche": "Metallverarbeitung",
+    "land_iso2": "TR",
+    "land_m49": 792,
+    "land_name": "Türkei",
+    "hs_code": "72",
+    "ware": "Eisen und Stahl",
+    "handelsvolumen_eur_jahr": 830000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 66,
+      "sanktions_exposure": 28,
+      "handels_exposure": 48
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-013",
+    "name": "Shenzhen MicroParts Ltd.",
+    "branche": "Elektronik",
+    "land_iso2": "CN",
+    "land_m49": 156,
+    "land_name": "China",
+    "hs_code": "85",
+    "ware": "Elektrotechnik / Bauteile",
+    "handelsvolumen_eur_jahr": 4100000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 58,
+      "sanktions_exposure": 35,
+      "handels_exposure": 72
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-014",
+    "name": "Guangdong Plastics Co.",
+    "branche": "Kunststoff",
+    "land_iso2": "CN",
+    "land_m49": 156,
+    "land_name": "China",
+    "hs_code": "39",
+    "ware": "Kunststoffe",
+    "handelsvolumen_eur_jahr": 1560000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 58,
+      "sanktions_exposure": 35,
+      "handels_exposure": 72
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-015",
+    "name": "Jiangsu Precision Tools",
+    "branche": "Maschinenbau",
+    "land_iso2": "CN",
+    "land_m49": 156,
+    "land_name": "China",
+    "hs_code": "84",
+    "ware": "Maschinen / Anlagen",
+    "handelsvolumen_eur_jahr": 2300000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 58,
+      "sanktions_exposure": 35,
+      "handels_exposure": 72
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-016",
+    "name": "Suzhou TextileWorks",
+    "branche": "Textil",
+    "land_iso2": "CN",
+    "land_m49": 156,
+    "land_name": "China",
+    "hs_code": "62",
+    "ware": "Textilien (konfektioniert)",
+    "handelsvolumen_eur_jahr": 990000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 58,
+      "sanktions_exposure": 35,
+      "handels_exposure": 72
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-017",
+    "name": "Mumbai Pharma Chem Pvt",
+    "branche": "Chemie",
+    "land_iso2": "IN",
+    "land_m49": 356,
+    "land_name": "Indien",
+    "hs_code": "29",
+    "ware": "Organische Chemikalien",
+    "handelsvolumen_eur_jahr": 1120000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 53,
+      "sanktions_exposure": 18,
+      "handels_exposure": 55
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-018",
+    "name": "Chennai Components Pvt",
+    "branche": "Elektronik",
+    "land_iso2": "IN",
+    "land_m49": 356,
+    "land_name": "Indien",
+    "hs_code": "85",
+    "ware": "Elektrotechnik / Bauteile",
+    "handelsvolumen_eur_jahr": 870000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 53,
+      "sanktions_exposure": 18,
+      "handels_exposure": 55
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-019",
+    "name": "Tamil Cotton Mills",
+    "branche": "Textil",
+    "land_iso2": "IN",
+    "land_m49": 356,
+    "land_name": "Indien",
+    "hs_code": "61",
+    "ware": "Textilien (gewirkt)",
+    "handelsvolumen_eur_jahr": 640000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 53,
+      "sanktions_exposure": 18,
+      "handels_exposure": 55
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-020",
+    "name": "Saigon Garments JSC",
+    "branche": "Textil",
+    "land_iso2": "VN",
+    "land_m49": 704,
+    "land_name": "Vietnam",
+    "hs_code": "62",
+    "ware": "Textilien (konfektioniert)",
+    "handelsvolumen_eur_jahr": 780000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 55,
+      "sanktions_exposure": 12,
+      "handels_exposure": 50
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-021",
+    "name": "Hanoi Electronics Co.",
+    "branche": "Elektronik",
+    "land_iso2": "VN",
+    "land_m49": 704,
+    "land_name": "Vietnam",
+    "hs_code": "85",
+    "ware": "Elektrotechnik / Bauteile",
+    "handelsvolumen_eur_jahr": 950000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 55,
+      "sanktions_exposure": 12,
+      "handels_exposure": 50
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-022",
+    "name": "Dhaka Apparel Ltd.",
+    "branche": "Textil",
+    "land_iso2": "BD",
+    "land_m49": 50,
+    "land_name": "Bangladesch",
+    "hs_code": "61",
+    "ware": "Textilien (gewirkt)",
+    "handelsvolumen_eur_jahr": 1080000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 70,
+      "sanktions_exposure": 14,
+      "handels_exposure": 60
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-023",
+    "name": "Chittagong Knitwear",
+    "branche": "Textil",
+    "land_iso2": "BD",
+    "land_m49": 50,
+    "land_name": "Bangladesch",
+    "hs_code": "61",
+    "ware": "Textilien (gewirkt)",
+    "handelsvolumen_eur_jahr": 560000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 70,
+      "sanktions_exposure": 14,
+      "handels_exposure": 60
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-024",
+    "name": "Ural Metall OOO",
+    "branche": "Metallverarbeitung",
+    "land_iso2": "RU",
+    "land_m49": 643,
+    "land_name": "Russland",
+    "hs_code": "72",
+    "ware": "Eisen und Stahl",
+    "handelsvolumen_eur_jahr": 420000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 82,
+      "sanktions_exposure": 92,
+      "handels_exposure": 80
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-025",
+    "name": "Sibir Erz GmbH",
+    "branche": "Bergbau",
+    "land_iso2": "RU",
+    "land_m49": 643,
+    "land_name": "Russland",
+    "hs_code": "26",
+    "ware": "Erze / Mineralien",
+    "handelsvolumen_eur_jahr": 310000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 82,
+      "sanktions_exposure": 92,
+      "handels_exposure": 80
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-026",
+    "name": "Penang SemiTech Sdn Bhd",
+    "branche": "Elektronik",
+    "land_iso2": "MY",
+    "land_m49": 458,
+    "land_name": "Malaysia",
+    "hs_code": "85",
+    "ware": "Elektrotechnik / Bauteile",
+    "handelsvolumen_eur_jahr": 1340000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 42,
+      "sanktions_exposure": 8,
+      "handels_exposure": 38
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-027",
+    "name": "Selangor Timber Bhd",
+    "branche": "Holz",
+    "land_iso2": "MY",
+    "land_m49": 458,
+    "land_name": "Malaysia",
+    "hs_code": "44",
+    "ware": "Holz / Holzwaren",
+    "handelsvolumen_eur_jahr": 480000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 42,
+      "sanktions_exposure": 8,
+      "handels_exposure": 38
+    }
+  },
+  {
+    "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+    "lieferant_id": "LF-028",
+    "name": "Amazonia Minerios Ltda",
+    "branche": "Bergbau",
+    "land_iso2": "BR",
+    "land_m49": 76,
+    "land_name": "Brasilien",
+    "hs_code": "26",
+    "ware": "Erze / Mineralien",
+    "handelsvolumen_eur_jahr": 720000,
+    "risiko_dimensionen": {
+      "geopolitik_governance": 52,
+      "sanktions_exposure": 6,
+      "handels_exposure": 35
+    }
+  }
+]

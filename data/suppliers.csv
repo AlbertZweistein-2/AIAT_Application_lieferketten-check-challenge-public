@@ -1,0 +1,29 @@
+_hinweis,lieferant_id,name,branche,land_iso2,land_m49,land_name,hs_code,ware,handelsvolumen_eur_jahr,geopolitik_governance,sanktions_exposure,handels_exposure
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-001,NordStahl GmbH,Metallverarbeitung,AT,40,Österreich,72,Eisen und Stahl,1850000,12,2,10
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-002,AlpenTextil AG,Textil,AT,40,Österreich,61,Textilien (gewirkt),620000,12,2,10
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-003,Donau Kunststoff KG,Kunststoff,AT,40,Österreich,39,Kunststoffe,430000,12,2,10
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-004,Rheinland Maschinenbau,Maschinenbau,DE,276,Deutschland,84,Maschinen / Anlagen,3200000,15,3,12
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-005,Bayern Elektronik GmbH,Elektronik,DE,276,Deutschland,85,Elektrotechnik / Bauteile,2750000,15,3,12
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-006,Hanse Chemie SE,Chemie,DE,276,Deutschland,29,Organische Chemikalien,1900000,15,3,12
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-007,Milano Tessuti S.p.A.,Textil,IT,380,Italien,62,Textilien (konfektioniert),880000,30,4,18
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-008,Adriatica Macchine srl,Maschinenbau,IT,380,Italien,84,Maschinen / Anlagen,540000,30,4,18
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-009,Wisla Components Sp.z.o.o.,Elektronik,PL,616,Polen,85,Elektrotechnik / Bauteile,710000,34,5,22
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-010,Krakow Stahlwerk,Metallverarbeitung,PL,616,Polen,72,Eisen und Stahl,960000,34,5,22
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-011,Anadolu Tekstil A.S.,Textil,TR,792,Türkei,61,Textilien (gewirkt),1240000,66,28,48
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-012,Bosporus Metal Ltd.,Metallverarbeitung,TR,792,Türkei,72,Eisen und Stahl,830000,66,28,48
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-013,Shenzhen MicroParts Ltd.,Elektronik,CN,156,China,85,Elektrotechnik / Bauteile,4100000,58,35,72
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-014,Guangdong Plastics Co.,Kunststoff,CN,156,China,39,Kunststoffe,1560000,58,35,72
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-015,Jiangsu Precision Tools,Maschinenbau,CN,156,China,84,Maschinen / Anlagen,2300000,58,35,72
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-016,Suzhou TextileWorks,Textil,CN,156,China,62,Textilien (konfektioniert),990000,58,35,72
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-017,Mumbai Pharma Chem Pvt,Chemie,IN,356,Indien,29,Organische Chemikalien,1120000,53,18,55
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-018,Chennai Components Pvt,Elektronik,IN,356,Indien,85,Elektrotechnik / Bauteile,870000,53,18,55
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-019,Tamil Cotton Mills,Textil,IN,356,Indien,61,Textilien (gewirkt),640000,53,18,55
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-020,Saigon Garments JSC,Textil,VN,704,Vietnam,62,Textilien (konfektioniert),780000,55,12,50
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-021,Hanoi Electronics Co.,Elektronik,VN,704,Vietnam,85,Elektrotechnik / Bauteile,950000,55,12,50
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-022,Dhaka Apparel Ltd.,Textil,BD,50,Bangladesch,61,Textilien (gewirkt),1080000,70,14,60
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-023,Chittagong Knitwear,Textil,BD,50,Bangladesch,61,Textilien (gewirkt),560000,70,14,60
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-024,Ural Metall OOO,Metallverarbeitung,RU,643,Russland,72,Eisen und Stahl,420000,82,92,80
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-025,Sibir Erz GmbH,Bergbau,RU,643,Russland,26,Erze / Mineralien,310000,82,92,80
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-026,Penang SemiTech Sdn Bhd,Elektronik,MY,458,Malaysia,85,Elektrotechnik / Bauteile,1340000,42,8,38
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-027,Selangor Timber Bhd,Holz,MY,458,Malaysia,44,Holz / Holzwaren,480000,42,8,38
+synthetisch / vereinfacht Stand 2026-06, keine offizielle AI:AT-Position,LF-028,Amazonia Minerios Ltda,Bergbau,BR,76,Brasilien,26,Erze / Mineralien,720000,52,6,35

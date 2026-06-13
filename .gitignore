@@ -1,0 +1,24 @@
+# Abhängigkeiten / Build-Artefakte
+node_modules/
+dist/
+build/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secrets / lokale Umgebung
+.env
+.env.local
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Orchestrator / interne Tooling-Artefakte
+.orchestrator/
+.claude/

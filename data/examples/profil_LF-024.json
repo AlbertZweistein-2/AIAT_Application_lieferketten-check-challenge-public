@@ -1,0 +1,17 @@
+{
+  "_hinweis": "synthetisch / vereinfacht, Stand 2026-06, keine offizielle AI:AT-Position",
+  "lieferant_id": "LF-024",
+  "name": "Ural Metall OOO",
+  "branche": "Metallverarbeitung",
+  "land_iso2": "RU",
+  "land_m49": 643,
+  "land_name": "Russland",
+  "hs_code": "72",
+  "ware": "Eisen und Stahl",
+  "handelsvolumen_eur_jahr": 420000,
+  "risiko_dimensionen": {
+    "geopolitik_governance": 82,
+    "sanktions_exposure": 92,
+    "handels_exposure": 80
+  }
+}
