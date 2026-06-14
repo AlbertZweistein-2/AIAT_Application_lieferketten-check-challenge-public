@@ -1,10 +1,12 @@
 # Seed-Dataset: Felder & Hinweise
 
+[Zurück zum Root README](../README.md)
+
 > ⚠️ Das Dataset ist synthetisch und vereinfacht (Stand 2026-06) und keine offizielle AI:AT-Position. Die Lieferanten sind frei erfunden. Die je Land hinterlegten Risiko-Dimensionen sind an echte Worldwide-Governance-Indicators-Werte (World Bank, WGI 2023) angelehnt und vereinfacht; sie sind kein Audit-Ergebnis und keine Aussage über reale Unternehmen oder Länder. Das Ergebnis des Agents ist ein First-Pass-Screening, keine rechts- oder compliance-sichere CSDDD-Auskunft. Kein Domänenwissen nötig: die Felder unten verstehst du ohne Vorwissen. Behandle die Zahlen als Spielmaterial, nicht als Compliance-Daten.
 
-## `suppliers.json` / `suppliers.csv` (Lieferantenliste)
+## [suppliers.json](./suppliers.json) / [suppliers.csv](./suppliers.csv) (Lieferantenliste)
 
-`suppliers.json` und `suppliers.csv` enthalten dieselben Daten: eine synthetische Lieferantenliste mit 28 Einträgen aus 12 Ländern. Die CSV öffnest du bequem in Excel/Sheets; die JSON ist praktisch zum Einlesen im Code.
+[suppliers.json](./suppliers.json) und [suppliers.csv](./suppliers.csv) enthalten dieselben Daten: eine synthetische Lieferantenliste mit 28 Einträgen aus 12 Ländern. Die CSV öffnest du bequem in Excel/Sheets; die JSON ist praktisch zum Einlesen im Code.
 
 | Feld | Typ | Bedeutung |
 |---|---|---|
@@ -26,15 +28,15 @@
 
 **Überblick über die Lieferanten:** 28 Einträge aus 12 Ländern (AT, DE, IT, PL, TR, CN, IN, VN, BD, RU, MY, BR) mit kontrastierenden Risiko-Profilen, von niedrig (Westeuropa) über mittel (Südostasien, Indien) bis hoch (Russland).
 
-`suppliers.json` trägt in jedem Eintrag ein `_hinweis`-Feld mit dem Synthetik-Vermerk. *(Die `suppliers.csv` führt den Hinweis ebenfalls je Zeile; der Disclaimer steht zusätzlich hier im README.)*
+[suppliers.json](./suppliers.json) trägt in jedem Eintrag ein `_hinweis`-Feld mit dem Synthetik-Vermerk. *(Die [suppliers.csv](./suppliers.csv) führt den Hinweis ebenfalls je Zeile; der Disclaimer steht zusätzlich hier im README.)*
 
-## `examples/` (Beispiel-Lieferanten-Profile)
+## [examples/](./examples/) (Beispiel-Lieferanten-Profile)
 
 Drei Beispiel-Profile aus dem Dataset als eigenständige JSON-Dateien, Ausgangspunkt für deine Arbeit:
 
-- `profil_LF-001.json`: niedriges Risiko (Österreich, Metallverarbeitung)
-- `profil_LF-013.json`: mittleres Risiko (China, Elektronik)
-- `profil_LF-024.json`: hohes Risiko (Russland, Metallverarbeitung)
+- [profil_LF-001.json](./examples/profil_LF-001.json): niedriges Risiko (Österreich, Metallverarbeitung)
+- [profil_LF-013.json](./examples/profil_LF-013.json): mittleres Risiko (China, Elektronik)
+- [profil_LF-024.json](./examples/profil_LF-024.json): hohes Risiko (Russland, Metallverarbeitung)
 
 Die drei Profile sind bewusst kontrastierend gewählt, damit sie das volle Risiko-Spektrum des Datensatzes repräsentieren.
 
@@ -47,3 +49,9 @@ Wer den Live-Pfad bauen möchte, kann folgende offene APIs nutzen; auf den genut
 - **EU Consolidated Sanctions List:** `webgate.ec.europa.eu/fsd/fsf` (Sanktions-Screening)
 
 Das ist ein optionaler Stretch; der mitgelieferte Seed reicht für die Aufgabe vollständig aus.
+
+## Navigation
+
+- [Zurück zum Root README](../README.md)
+- [Zu den Developer-Notizen](../dev/README.md)
+- [Zum Eval-Set](./eval-set.json)

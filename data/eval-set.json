@@ -1,0 +1,200 @@
+[
+  {
+    "id": "EVAL-001",
+    "name": "Low-risk EU baseline",
+    "rationale": "Low values in all risk dimensions should stay green.",
+    "expected_ampel": "grün",
+    "expected_score_min": 0,
+    "expected_score_max": 34.9,
+    "supplier": {
+      "lieferant_id": "EVAL-001",
+      "name": "Eval Low Risk GmbH",
+      "branche": "Maschinenbau",
+      "land_iso2": "AT",
+      "land_m49": 40,
+      "land_name": "Österreich",
+      "hs_code": "84",
+      "ware": "Maschinenteile",
+      "handelsvolumen_eur_jahr": 120000,
+      "risiko_dimensionen": {
+        "geopolitik_governance": 10,
+        "sanktions_exposure": 2,
+        "handels_exposure": 12
+      }
+    }
+  },
+  {
+    "id": "EVAL-002",
+    "name": "Sanctions hard-stop",
+    "rationale": "Sanctions exposure at the hard-stop threshold must force red even if the weighted score is only medium.",
+    "expected_ampel": "rot",
+    "expected_score_min": 35,
+    "expected_score_max": 64.9,
+    "expected_top_driver": "sanktions_exposure",
+    "supplier": {
+      "lieferant_id": "EVAL-002",
+      "name": "Eval Sanctions GmbH",
+      "branche": "Elektronik",
+      "land_iso2": "TS",
+      "land_m49": 999,
+      "land_name": "Testland",
+      "hs_code": "85",
+      "ware": "Elektronikbauteile",
+      "handelsvolumen_eur_jahr": 90000,
+      "risiko_dimensionen": {
+        "geopolitik_governance": 5,
+        "sanktions_exposure": 85,
+        "handels_exposure": 5
+      }
+    }
+  },
+  {
+    "id": "EVAL-003",
+    "name": "Balanced medium risk",
+    "rationale": "Moderate values across all dimensions should produce a yellow first-pass result.",
+    "expected_ampel": "gelb",
+    "expected_score_min": 35,
+    "expected_score_max": 64.9,
+    "supplier": {
+      "lieferant_id": "EVAL-003",
+      "name": "Eval Medium Components Ltd.",
+      "branche": "Textil",
+      "land_iso2": "TM",
+      "land_m49": 998,
+      "land_name": "Test-Mittelland",
+      "hs_code": "62",
+      "ware": "Textilwaren",
+      "handelsvolumen_eur_jahr": 180000,
+      "risiko_dimensionen": {
+        "geopolitik_governance": 45,
+        "sanktions_exposure": 40,
+        "handels_exposure": 50
+      }
+    }
+  },
+  {
+    "id": "EVAL-004",
+    "name": "High aggregate risk without sanctions hard-stop",
+    "rationale": "A high weighted score should become red even when sanctions exposure stays below the hard-stop threshold.",
+    "expected_ampel": "rot",
+    "expected_score_min": 65,
+    "expected_score_max": 100,
+    "supplier": {
+      "lieferant_id": "EVAL-004",
+      "name": "Eval High Aggregate OOO",
+      "branche": "Metallverarbeitung",
+      "land_iso2": "TH",
+      "land_m49": 997,
+      "land_name": "Test-Hochrisikoland",
+      "hs_code": "72",
+      "ware": "Stahl",
+      "handelsvolumen_eur_jahr": 320000,
+      "risiko_dimensionen": {
+        "geopolitik_governance": 75,
+        "sanktions_exposure": 70,
+        "handels_exposure": 50
+      }
+    }
+  },
+  {
+    "id": "EVAL-005",
+    "name": "Trade exposure spike only",
+    "rationale": "Trade exposure has lower weight, but extreme trade concentration should still trigger at least a yellow diversification check.",
+    "expected_ampel": "gelb",
+    "expected_score_min": 0,
+    "expected_score_max": 34.9,
+    "expected_top_driver": "handels_exposure",
+    "expected_reasoning_contains": "Diversifikation",
+    "supplier": {
+      "lieferant_id": "EVAL-005",
+      "name": "Eval Concentrated Trade GmbH",
+      "branche": "Chemie",
+      "land_iso2": "TC",
+      "land_m49": 996,
+      "land_name": "Test-Handelsland",
+      "hs_code": "29",
+      "ware": "Chemische Erzeugnisse",
+      "handelsvolumen_eur_jahr": 240000,
+      "risiko_dimensionen": {
+        "geopolitik_governance": 5,
+        "sanktions_exposure": 5,
+        "handels_exposure": 100
+      }
+    }
+  },
+  {
+    "id": "EVAL-006",
+    "name": "All risk dimensions missing",
+    "rationale": "If all risk dimensions are missing, the supplier should be conservatively escalated to red.",
+    "expected_ampel": "rot",
+    "expected_score_min": 100,
+    "expected_score_max": 100,
+    "expected_data_quality_contains": "Alle Risiko-Dimensionen fehlen",
+    "supplier": {
+      "lieferant_id": "EVAL-006",
+      "name": "Eval Missing Risk Data GmbH",
+      "branche": "Elektronik",
+      "land_iso2": "TX",
+      "land_m49": 995,
+      "land_name": "Test-Unbekannt",
+      "hs_code": "85",
+      "ware": "Elektronikbauteile",
+      "handelsvolumen_eur_jahr": 110000,
+      "risiko_dimensionen": {
+        "geopolitik_governance": "NA",
+        "sanktions_exposure": "NaN",
+        "handels_exposure": "n/a"
+      }
+    }
+  },
+  {
+    "id": "EVAL-007",
+    "name": "Invalid risk value",
+    "rationale": "A non-numeric risk string is not a known missing marker and should be treated as invalid data quality.",
+    "expected_ampel": "rot",
+    "expected_score_min": 100,
+    "expected_score_max": 100,
+    "expected_data_quality_contains": "ungültig angegeben",
+    "supplier": {
+      "lieferant_id": "EVAL-007",
+      "name": "Eval Invalid Risk GmbH",
+      "branche": "Metallverarbeitung",
+      "land_iso2": "TI",
+      "land_m49": 994,
+      "land_name": "Test-Invalid",
+      "hs_code": "72",
+      "ware": "Stahl",
+      "handelsvolumen_eur_jahr": 95000,
+      "risiko_dimensionen": {
+        "geopolitik_governance": "hoch",
+        "sanktions_exposure": 5,
+        "handels_exposure": 5
+      }
+    }
+  },
+  {
+    "id": "EVAL-008",
+    "name": "Missing trade exposure without peer",
+    "rationale": "Missing trade exposure without a same-country peer is set to 100 and the supplier is forced to at least yellow.",
+    "expected_ampel": "gelb",
+    "expected_score_min": 0,
+    "expected_score_max": 34.9,
+    "expected_data_quality_contains": "mindestens auf gelb",
+    "supplier": {
+      "lieferant_id": "EVAL-008",
+      "name": "Eval Missing Trade GmbH",
+      "branche": "Textil",
+      "land_iso2": "TT",
+      "land_m49": 993,
+      "land_name": "Test-Trade",
+      "hs_code": "62",
+      "ware": "Textilwaren",
+      "handelsvolumen_eur_jahr": 75000,
+      "risiko_dimensionen": {
+        "geopolitik_governance": 5,
+        "sanktions_exposure": 5,
+        "handels_exposure": "NA"
+      }
+    }
+  }
+]

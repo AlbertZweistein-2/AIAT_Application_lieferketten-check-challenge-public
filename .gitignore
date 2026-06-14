@@ -22,3 +22,7 @@ Thumbs.db
 # Orchestrator / interne Tooling-Artefakte
 .orchestrator/
 .claude/
+.codex/
+.agents/
+
+reports/

@@ -34,6 +34,13 @@ function aggregiereRisiko(
   dim: RisikoDimensionen,
   gewichtung: Gewichtung
 ): RisikoErgebnis {
+  // REVIEW: Risiko-Dimensionen sollten validiert werden (Zahl, 0–100, nicht fehlend).
+  //         Der Wert 0 ist gültig und darf nicht als fehlend behandelt werden.
+  //         Fehlende oder ungültige Werte sollten dokumentiert und konservativ geflaggt werden.
+
+  // REVIEW: Gewichtungen sollten geprüft werden. Die Summe muss nicht 1 sein,
+  //         weil unten durch gewichtSumme normalisiert wird; negative,
+  //         nicht-numerische oder insgesamt <= 0 gewichtete Eingaben sind aber ungültig.
   const gewichtSumme =
     gewichtung.geopolitik_governance +
     gewichtung.sanktions_exposure +
@@ -41,11 +48,25 @@ function aggregiereRisiko(
 
   // Gewichteter Score: je Dimension den (Governance-/Sanktions-/Handels-)Beitrag
   // bilden und über die Gewicht-Summe normalisieren, damit der Score in 0–100 bleibt.
-  const gewichtet =
-    (100 - dim.geopolitik_governance) * gewichtung.geopolitik_governance +
-    (100 - dim.sanktions_exposure) * gewichtung.sanktions_exposure +
-    (100 - dim.handels_exposure) * gewichtung.handels_exposure;
 
+  // ---------------------------------------------------------------------------
+  // REVIEW:
+  // 100 - X ist falsch, wenn die Dimensionen bereits so normiert sind, dass hoch = mehr Risiko.
+  // const gewichtet =
+  //   (100 - dim.geopolitik_governance) * gewichtung.geopolitik_governance +
+  //   (100 - dim.sanktions_exposure) * gewichtung.sanktions_exposure +
+  //   (100 - dim.handels_exposure) * gewichtung.handels_exposure;
+
+  // FIX:
+  const gewichtet =
+    dim.geopolitik_governance * gewichtung.geopolitik_governance +
+    dim.sanktions_exposure * gewichtung.sanktions_exposure +
+    dim.handels_exposure * gewichtung.handels_exposure;
+
+  // ---------------------------------------------------------------------------
+
+  // REVIEW: Rundung vor Kategorisierung kann Grenzwerte kippen; besser wäre:
+  //         Ampel mit ungerundetem Score bestimmen, Ausgabe danach runden.
   const risiko_score = Math.round((gewichtet / gewichtSumme) * 10) / 10;
 
   let ampel: Ampel;

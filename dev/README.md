@@ -1,190 +1,240 @@
-# AI Developer Challenge: „Lieferketten-Check"
+# Developer Challenge Notes
 
-Version 1.0 · 2026-06 · Kontakt: AI:AT Hiring Team
+[Zurueck zum Root README](../README.md)
 
-Schön, dass du dabei bist. Das hier ist kein Trick-Test, sondern ein echtes Stück von dem, was wir im Venture Studio und n8n CoE täglich tun: mit KI schnell etwas Lauffähiges bauen, das Mehrwert schafft.
+Dieses Dokument beschreibt die Umsetzung der AI:AT Developer Challenge aus [dev/Challenge.md](./Challenge.md): Teil A, Teil B, zentrale Design-Entscheidungen, Trade-offs und bewusst nicht umgesetzte Stretch-Ziele.
 
-Es gibt keine Musterlösung, die du treffen musst. Uns interessiert, wie du ein unscharf spezifiziertes Problem zerlegst, Entscheidungen triffst und KI sinnvoll einsetzt.
+Die Challenge-Instruktionen bleiben in den verlinkten [Challenge.md](../Challenge.md)-Dateien erhalten:
 
-## Die Mission
+- [../Challenge.md](../Challenge.md): allgemeine Challenge-Uebersicht.
+- [./Challenge.md](./Challenge.md): Developer-Challenge mit Teil A und Teil B.
 
-EU-Unternehmen mit Lieferkette müssen seit der **CSDDD** (Corporate Sustainability Due Diligence Directive) ihre Lieferanten auf Geopolitik-, Sanktions- und ESG-Risiken prüfen. Manuell ist das pro Lieferant Stunden Recherche aus heterogenen Quellen: Governance-Indizes, Sanktionslisten, Handelsstatistiken.
+Weitere Abgabe-Artefakte:
 
-Bau einen „Lieferketten-Check"-Agent: ein TS/Node-Tool, das eine Lieferantenliste einliest und je Lieferant einen erklärbaren Risiko-Score samt Ampel erzeugt. Ein automatisierter CSDDD-First-Pass, der zeigt, welche Lieferanten grün (unkritisch) sind und welche eine vertiefte Prüfung (gelb/rot) brauchen.
+- [../DECISION_LOG.md](../DECISION_LOG.md): Entscheidungen, Trade-offs und Schluessel-Prompts.
+- [../SELF_REPORT.md](../SELF_REPORT.md): Selbst-Report-Vorlage zum finalen Ausfuellen.
 
-Wir liefern dir ein Seed-Dataset mit 28 synthetischen Lieferanten aus 12 Ländern (JSON), je Lieferant Name, Land, Warengruppe, Handelsvolumen und drei bereits normalisierte Risiko-Dimensionen (Geopolitik/Governance, Sanktions-Exposure, Handels-Exposure). Kein Domänenwissen nötig: alles, was du brauchst, steckt im Dataset und in dieser Aufgabe.
+## Umsetzung Teil A
 
-> 📂 Im Repo: [`../data/`](../data/) mit `suppliers.json`, `suppliers.csv` und Beispiel-Profilen (Feld-Doku: [`../data/README.md`](../data/README.md)).
-> Muster „fetch → enrich → aggregate → report": Lieferantenliste laden, Dimensionen aggregieren, Bericht ausgeben.
+Gebaut wurde ein deterministisches TS/Node-CLI, das:
 
-### Teil A: Bau den Agent (Pflicht)
+- [../data/suppliers.json](../data/suppliers.json) oder [../data/suppliers.csv](../data/suppliers.csv) einliest
+- je Lieferant einen Risiko-Score `0-100` berechnet
+- eine Ampel `gruen` / `gelb` / `rot` vergibt
+- die wichtigsten Treiber erklaert
+- eine Handlungsempfehlung erzeugt
+- eine Portfolio-Uebersicht nach Risiko sortiert ausgibt
+- Terminal-, Markdown- und optional JSON-Reports erzeugt
 
-- **Input:** `suppliers.json`, je Lieferant `lieferant_id`, `name`, `land_iso2`, `land_name`, `branche`, `hs_code`, `ware`, `handelsvolumen_eur_jahr` sowie drei Risiko-Dimensionen (alle 0–100, hoch = mehr Risiko).
-- **Output:** für jeden Lieferanten ein erklärbarer Risiko-Report:
-  - **Risiko-Score** 0–100 (aggregiert aus den drei Dimensionen)
-  - **Ampel:** grün / gelb / rot
-  - **Treiber-Begründung:** welche Dimensionen treiben den Score (mindestens 1–2 Sätze)
-  - **Handlungsempfehlung** (First-Pass: z. B. „unkritisch", „vertiefte Prüfung empfohlen", „sofortige Eskalation")
-  - Plus eine **Portfolio-Übersicht:** alle Lieferanten sortiert nach Risiko (höchstes zuerst), mit Ampel-Verteilung.
-- **Form:** lauffähiges Git-Repo mit echtem Code und ein README, das uns das Ding in < 5 min zum Laufen bringt, ohne API-Key und deterministisch auf dem Seed. Stack ist dir überlassen (TypeScript/tsx ist naheliegend, aber nichts ist vorgeschrieben).
+Der Kern ist bewusst ohne API-Key und ohne LLM-Abhaengigkeit lauffaehig, weil die Challenge einen deterministischen Seed-Lauf verlangt.
 
-> Die interessante Design-Entscheidung: Die drei Risiko-Dimensionen haben unterschiedliche Relevanz. Wie gewichtest du sie zu einem Score, und wie begründest du das? (Geopolitik stärker als Handel? Sanktionen als Hard-Blocker?) Es gibt keine vorgegebene Formel, und genau das ist das Signal. Dokumentiere deine Gewichtung als explizite Annahme im README oder im Code-Kommentar. Ebenso: Was tust du, wenn eine Dimension fehlt oder 0 ist? Ignorieren, Default-Wert, oder den Score als „unzureichende Daten" markieren?
+## Umsetzung Teil B
 
-> Ein LLM-Call ist erlaubt, z. B. für die Begründungstexte oder Handlungsempfehlungen, aber nicht Pflicht. Regelbasierte Texte sind völlig okay, und es ist kein API-Key nötig. (Optionaler Stretch: Live-Anbindung an World Bank WGI / UN Comtrade / EU-Sanktionsliste über ein `--live`-Flag, mit deterministischem Fallback auf den Seed. Auf den öffentlichen Pfaden brauchst du keinen Key.)
+Die Code-Review-Antwort liegt in [dev/code-review/REVIEW.md](./code-review/REVIEW.md).
 
-### Teil B: Code-Review (~15 min)
+Der zentrale Bug im Snippet ist die faelschliche Invertierung der bereits normalisierten Risiko-Werte durch `100 - value`. Laut Dataset gilt aber: `0-100`, hoch bedeutet mehr Risiko. Dadurch werden Low-Risk-Lieferanten hoch priorisiert und High-Risk-Lieferanten entlastet. Das ist fachlich kritisch, weil der First-Pass genau die riskanten Lieferanten sichtbar machen soll.
 
-Wir geben dir ein kurzes, KI-generiertes Code-Snippet (TypeScript, keine TS-Erfahrung nötig, der Bug ist sprachunabhängig verständlich). Tipp: vergleiche, was der Doc-Kommentar verspricht, mit dem, was der Code tut, und führe den Code im Kopf an einem Beispiel mit hohem Risiko durch. Es gibt einen zentralen funktionalen Bug. Finde ihn, fixe ihn, und begründe in 3–5 Sätzen, warum es einer ist. Sag uns auch, was dir sonst auffällt: fehlende Edge-Cases, fragwürdige Annahmen, fehlende Normalisierungs-Behandlung, fehlende Tests. Diese weiterführende Kritik zählt für uns genauso wie der Fix selbst. Wir wollen sehen, ob du KI-Output beurteilen kannst, nicht nur erzeugen.
+## Scoring-Entscheidungen
 
-> Das Snippet liegt als Datei unter [`code-review/snippet.ts`](./code-review/snippet.ts) und ist unten in **Anhang A** abgedruckt.
+Alle Risiko-Dimensionen sind bereits normalisiert:
 
-## Spielregeln
-
-- **Aufwand: ~2–4 fokussierte Stunden.** Du hast eine Woche; die ist für Flexibilität da, nicht zum Durchgrinden. Bitte nicht überinvestieren: wir bewerten Denken und Urteil, nicht Politur. *(Die 2–4 h schließen Walkthrough und Decision-Log ein. Loom: 1 Take, 3–5 min; Decision-Log: 5–10 Zeilen Stichworte.)*
-- **Nutze jede KI, jede Library, google frei.** Wird erwartet, nicht nur erlaubt. Cursor, Claude, Copilot, Coding-Agents: leg los.
-- **Der Kern (A + B) ist die Latte.** Dazu gehören auch ein paar sinnvolle Tests (kein Coverage-Theater; zählen mit 10 %). Echte Stretch-Goals (UI, Live-API-Anbindung, Eval-Set gegen bekannte Hochrisiko-Länder, Alert-Export, Deployment) sind zum Glänzen, komplett optional.
-
-> Ein rauer Kern mit klarem Denken schlägt eine polierte, aber oberflächliche Umsetzung. Wir meinen das ernst, bitte nicht überinvestieren. Mehr Stunden bedeuten bei uns nicht mehr Punkte; wir bewerten das Kern-Ergebnis, nicht den Zeitaufwand.
-
-AI Factory Austria steht für Chancengleichheit. Brauchst du Unterstützung oder Anpassungen im Prozess, sag uns Bescheid, wir helfen. Ob Uni, Bootcamp oder self-taught: es zählt, wie du denkst und mit KI arbeitest.
-
-## Was du abgibst
-
-1. **Repo-Link** (GitHub/GitLab) mit Code und README.
-2. **Code-Review-Antwort** (Teil B), als Datei im Repo oder kurzes Doc.
-3. **Walkthrough (1 Take, 3–5 min, max. 5):** ein Loom/Screen-Recording. Zeig dein Ergebnis und erklär, wie du gebaut hast, vor allem die KI-Schritte. *(Kein Video möglich oder gewünscht? Ein knappes schriftliches Walkthrough-Skript zählt als gleichwertig, sag einfach Bescheid.)*
-4. **Kurzes Decision-Log + Schlüssel-Prompts:** 5–10 Zeilen Entscheidungen und Trade-offs plus die KI-Prompts, die den Unterschied gemacht haben. Zeig uns, wie du mit KI zusammenarbeitest; das ist genau die Fähigkeit, für die wir die Rolle besetzen.
-5. **Selbst-Report:** wie viele Stunden hast du investiert? (Ehrlich, kein Maluspunkt.)
-
-## So bewerten wir (transparent)
-
-| Dimension | Gewicht |
-|---|---|
-| Funktionalität (läuft es, erfüllt es den Kern) | 20% |
-| Decomposition & Urteil (Aggregation begründet, Lücken sinnvoll behandelt, gute Trade-offs) | 20% |
-| AI-Collaboration / Prozess (wie du KI gehebelt & geprüft hast) | 20% |
-| Code-Qualität & Taste (lesbar, wartbar, KI-„Slop" erkannt) | 15% |
-| Kommunikation / Doku (README, Decision-Log, Walkthrough) | 15% |
-| Tests (sinnvolle Tests, kein Coverage-Theater) | 10% |
-
-> Teil B (Code-Review) fließt nicht in die obige Gewichtung ein. Es ist ein separates Signal mit besonders hohem Informationsgehalt über dein Urteil zu KI-Code und kann bei knappen Entscheidungen den Ausschlag geben.
-
-## Abgabe & Zeitplan
-
-- **Deadline:** Die Begleit-E-Mail nennt das verbindliche Abgabedatum (Richtwert: 7 Kalendertage ab Erhalt).
-- **Abgabe:** per E-Mail an aiandbusinessgrowth@ai-at.eu.
-- **Rückmeldung:** Wir melden uns innerhalb von ~10 Werktagen, mit einem Termin für den Live-Teil oder einer kurzen Rückmeldung.
-
-> Die konkreten Daten (Abgabedatum, ggf. Upload-Link) findest du in der Begleit-E-Mail zu diesem Brief.
-
-## Danach
-
-Kurzer **Live-Walkthrough (30–45 min):** du zeigst dein Ergebnis, wir setzen live eine neue Anforderung drauf und schauen, wie du deinen eigenen Code erweiterst. Die neue Anforderung ist bewusst klein; es geht darum, wie du laut denkst, nicht um ein perfektes Ergebnis in 10 Minuten. Deine gewohnten KI-Tools darfst du dabei nutzen, genau wie beim Bauen. Danach zeigen wir dir unsere eigene Lösung und reden ehrlich darüber. Jede:r bekommt Feedback, egal wie's ausgeht.
-
-> **Fair & transparent.** Diese Challenge ist unbezahlt. Dafür bekommst du echten Gegenwert: nach dem Debrief zeigen wir dir unsere eigene Lösung, mit echten Entscheidungen, Prompts und Trade-offs. Das ist unser „Learn"-Versprechen in Aktion. Und: strukturiertes, ehrliches Feedback für jede:n, egal wie der Prozess ausgeht. Kein Ghosting, nie.
-
-## Spielregeln zu den Daten
-
-> Das Seed-Dataset ist synthetisch / vereinfacht (Stand 2026-06), keine offizielle AI:AT-Position. Die Lieferanten sind frei erfunden. Die je Land hinterlegten Risiko-Dimensionen sind an echte Worldwide-Governance-Indicators-Werte (World Bank, WGI 2023) angelehnt und vereinfacht; sie sind kein Audit-Ergebnis und keine Aussage über reale Unternehmen oder Länder. Das Ergebnis des Agents ist ein First-Pass-Screening, keine rechts- oder compliance-sichere CSDDD-Auskunft. Jeder JSON-Eintrag trägt ein `_hinweis`-Feld. Behandle die Zahlen als Spielmaterial, nicht als Compliance-Daten.
-
-## Datenschutz
-
-> **Datenschutz.** Deine Unterlagen (Repo-Link, Loom-Link, Dokumente, Prompts) nutzen wir ausschließlich für die Besetzungsentscheidung, geben sie nicht an unbeteiligte Dritte weiter und löschen sie spätestens **sechs Monate** nach Abschluss des Auswahlverfahrens (oder früher auf deinen Wunsch), gemäß DSGVO. Rechtsgrundlage ist die Anbahnung eines möglichen Arbeitsverhältnisses (Art. 6 DSGVO); du kannst jederzeit Auskunft oder Löschung verlangen. Was du erstellst, bleibt deins: wir verwenden es nur zur Bewertung, nie produktiv. Dein Repo kannst du auch privat halten und uns Zugriff geben; deinen Walkthrough sehen nur wir intern. Von dir gewählte Hosting-Dienste (z. B. GitHub, Loom) unterliegen deren eigenen Datenschutzbestimmungen. Fragen: aiandbusinessgrowth@ai-at.eu.
-
-## Anhang A: Code-Snippet (Teil B)
-
-Das ist das Snippet für Teil B: finde den Bug, fixe ihn, kritisiere kurz. (Auch als Datei: [`code-review/snippet.ts`](./code-review/snippet.ts).)
-
-```ts
-/**
- * aggregiereRisiko: Aggregiert die drei Risiko-Dimensionen eines Lieferanten zu
- * einem Gesamt-Risiko-Score (0–100) und leitet daraus eine Ampel ab.
- *
- * Konvention der Eingangsdaten (siehe Seed-Schema `data/README.md`):
- * Alle drei Dimensionen sind bereits auf **0–100, hoch = mehr Risiko** normalisiert.
- *   - geopolitik_governance: hoch = schlechtere Governance = mehr Risiko
- *   - sanktions_exposure:    hoch = mehr Sanktions-Treffer = mehr Risiko
- *   - handels_exposure:      hoch = stärkere Import-Konzentration = mehr Risiko
- *
- * Ergebnis: risiko_score 0–100 (hoch = mehr Risiko) + Ampel grün/gelb/rot.
- */
-
-interface RisikoDimensionen {
-  geopolitik_governance: number;
-  sanktions_exposure: number;
-  handels_exposure: number;
-}
-
-interface Gewichtung {
-  geopolitik_governance: number;
-  sanktions_exposure: number;
-  handels_exposure: number;
-}
-
-type Ampel = "grün" | "gelb" | "rot";
-
-interface RisikoErgebnis {
-  risiko_score: number;
-  ampel: Ampel;
-}
-
-function aggregiereRisiko(
-  dim: RisikoDimensionen,
-  gewichtung: Gewichtung
-): RisikoErgebnis {
-  const gewichtSumme =
-    gewichtung.geopolitik_governance +
-    gewichtung.sanktions_exposure +
-    gewichtung.handels_exposure;
-
-  // Gewichteter Score: je Dimension den (Governance-/Sanktions-/Handels-)Beitrag
-  // bilden und über die Gewicht-Summe normalisieren, damit der Score in 0–100 bleibt.
-  const gewichtet =
-    (100 - dim.geopolitik_governance) * gewichtung.geopolitik_governance +
-    (100 - dim.sanktions_exposure) * gewichtung.sanktions_exposure +
-    (100 - dim.handels_exposure) * gewichtung.handels_exposure;
-
-  const risiko_score = Math.round((gewichtet / gewichtSumme) * 10) / 10;
-
-  let ampel: Ampel;
-  if (risiko_score >= 60) {
-    ampel = "rot";
-  } else if (risiko_score >= 35) {
-    ampel = "gelb";
-  } else {
-    ampel = "grün";
-  }
-
-  return { risiko_score, ampel };
-}
-
-// ---------------------------------------------------------------------------
-// Demo
-// ---------------------------------------------------------------------------
-
-// Demo-Daten: vereinfachte Illustration, NICHT der echte Datensatz (siehe ../data/suppliers.json).
-const gewichtung: Gewichtung = {
-  geopolitik_governance: 0.45,
-  sanktions_exposure: 0.35,
-  handels_exposure: 0.2,
-};
-
-const lieferanten: { name: string; land: string; dim: RisikoDimensionen }[] = [
-  {
-    name: "NordStahl GmbH",
-    land: "Österreich",
-    dim: { geopolitik_governance: 12, sanktions_exposure: 2, handels_exposure: 10 },
-  },
-  {
-    name: "Ural Metall OOO",
-    land: "Russland",
-    dim: { geopolitik_governance: 82, sanktions_exposure: 92, handels_exposure: 80 },
-  },
-];
-
-console.log("Risiko-Screening (First-Pass):");
-for (const l of lieferanten) {
-  const { risiko_score, ampel } = aggregiereRisiko(l.dim, gewichtung);
-  console.log(`  • ${l.name} (${l.land}): Score ${risiko_score}/100 → ${ampel}`);
-}
+```text
+0 = niedriges Risiko
+100 = hohes Risiko
 ```
+
+Default-Gewichtung in [src/config.ts](../src/config.ts):
+
+- Geopolitik/Governance: `40 %`
+- Sanktions-Exposure: `40 %`
+- Handels-Exposure: `20 %`
+
+Begruendung:
+
+- Governance und geopolitische Stabilitaet sind breite Risikotreiber fuer Lieferketten- und Compliance-Risiko.
+- Sanktions-Exposure ist besonders kritisch, weil es schnell zu harten rechtlichen oder operativen Stopps fuehren kann.
+- Handels-Exposure ist relevant fuer Konzentrations- und Resilienzrisiko, aber allein weniger stark als Governance/Sanktionen.
+
+Score-Berechnung:
+
+```text
+score = governance * 0.4 + sanctions * 0.4 + trade * 0.2
+```
+
+Die Top-Treiber werden nach gewichtetem Beitrag sortiert:
+
+```text
+Rohwert * Gewicht = gewichteter Beitrag
+```
+
+Das war eine bewusste Korrektur gegenueber einer reinen Rohwert-Sortierung: Eine Dimension mit niedrigerem Rohwert, aber hoeherem Gewicht kann den Score staerker treiben.
+
+## Ampel-Logik
+
+Schwellen in [src/config.ts](../src/config.ts):
+
+- `rot`: Score ab `65`
+- `gelb`: Score ab `35`
+- `gruen`: Score unter `35`
+- `sanctionsHardStop`: Sanktions-Exposure ab `85` erzwingt `rot`
+- `tradeExposureMinimumYellow`: Handels-Exposure ab `90` erzwingt mindestens `gelb`
+
+Begruendung:
+
+- `35` und `65` teilen die 0-100-Skala in nachvollziehbare Low/Medium/High-Bereiche.
+- Sanktionen ab `85` sind ein Hard-Stop, weil starke Sanktionsnaehe auch bei sonst niedrigem Score eskaliert werden sollte.
+- Handels-Exposure ab `90` wird mindestens `gelb`, weil extreme Bezugs- oder Importkonzentration nicht als komplett unkritisch gelten sollte. Die Empfehlung nennt dann explizit eine Diversifikationspruefung.
+
+## Datenqualitaet und Missing Values
+
+Fehlende Risiko-Werte werden sichtbar behandelt und nicht still ignoriert.
+
+Als fehlend gelten unter anderem:
+
+```text
+NA, N/A, NaN, null, none, missing, unknown, unbekannt, k.a., -, --
+```
+
+Numerische Strings wie `"42"` werden fuer Risiko-Dimensionen als Zahlen gelesen.
+
+Nicht interpretierbare Werte wie `"hoch"` oder `"not-a-number"` werden als ungueltige Datenqualitaet behandelt. Der Lieferant wird dann konservativ auf `rot` gesetzt und mit Score `100/100` berichtet.
+
+Imputation:
+
+- Es wird nur pro fehlender Dimension imputiert, nicht ein ganzes Laenderprofil kopiert.
+- Imputiert wird aus Same-Country-Peers mit gleichem `land_iso2`.
+- Genutzt wird der Median der vorhandenen Werte dieser Dimension.
+- Peers, denen diese Dimension selbst fehlt oder bei denen sie ungueltig ist, werden fuer den Median ignoriert.
+- Wenn alle Risiko-Dimensionen fehlen, wird der Lieferant konservativ auf `rot` gesetzt.
+- Wenn `geopolitik_governance` oder `sanktions_exposure` fehlen und kein Same-Country-Peer verfuegbar ist, wird ebenfalls `rot` gesetzt.
+- Wenn nur `handels_exposure` fehlt und kein Same-Country-Peer verfuegbar ist, wird der Wert auf `100/100` gesetzt und die Ampel mindestens auf `gelb` angehoben.
+
+Jede Imputation oder Eskalation erscheint im Report unter `Datenqualitaet`.
+
+## Reporting-Entscheidungen
+
+Outputs:
+
+- Terminal-Report standardmaessig aktiv
+- Markdown-Report standardmaessig aktiv
+- JSON-Report optional mit `--json`
+
+CLI-Flags:
+
+- `--console` / `--no-console`
+- `--markdown` / `--no-markdown`
+- `--json` / `--no-json`
+- `--input` / `-i`
+- `--output-dir` / `-o`
+- `--help`, `-h`, `help`
+
+Markdown-Reports werden mit Timestamp geschrieben:
+
+```text
+reports/lieferketten-check-YYYY-MM-DD_HH-MM-SS.md
+```
+
+JSON-Reports werden analog geschrieben:
+
+```text
+reports/lieferketten-check-YYYY-MM-DD_HH-MM-SS.json
+```
+
+Die Ampel wird im Terminal farbig ausgegeben, wenn ANSI-Farben verfuegbar sind. Im Markdown werden die Ampel-Texte ueber HTML-Spans farbig dargestellt. Fuer Markdown-Ranking-Tabellen werden Top-Treiber kompakt mit einer Zeile pro Wert dargestellt.
+
+## Eval-Set und Tests
+
+Das Eval-Set liegt in:
+
+[data/eval-set.json](../data/eval-set.json)
+
+Es ist kein statistischer Benchmark, sondern ein kleines Guardrail-Set fuer erwartetes Modellverhalten:
+
+- Low-Risk bleibt `gruen`
+- mittlere Gesamtrisiken werden `gelb`
+- hohe aggregierte Risiken werden `rot`
+- Sanktions-Hard-Stop erzwingt `rot`
+- extreme Handels-Exposure erzwingt mindestens `gelb`
+- fehlende Risiko-Dimensionen werden konservativ behandelt
+- ungueltige Risiko-Werte werden konservativ behandelt
+
+Die Tests sind bewusst auf sinnvolle Kernfaelle begrenzt, weil die Challenge explizit "kein Coverage-Theater" verlangt. Geprueft werden unter anderem:
+
+- JSON- und CSV-Input
+- CLI-Optionen inklusive Help
+- Seed-Ranking
+- gewichtete Treiber
+- konfigurierbare Handels-Exposure-Schwelle
+- Same-Country-Imputation
+- Missing-/Invalid-Value-Handling
+- Report-Erzeugung
+- Eval-Set-Szenarien
+
+## Decomposition
+
+Die Implementierung wurde in kleine Module aufgeteilt:
+
+- [src/index.ts](../src/index.ts): CLI-Orchestrierung
+- [src/cli.ts](../src/cli.ts): Argument-Parsing und Help-Text
+- [src/config.ts](../src/config.ts): Gewichte, Schwellen, Defaults
+- [src/io.ts](../src/io.ts): JSON/CSV Input und Report-Dateien
+- [src/validation.ts](../src/validation.ts): Validierung, Missing-Marker, numerische String-Konvertierung
+- [src/scoring.ts](../src/scoring.ts): Score, Ampel, Treiber, Imputation, Empfehlungen
+- [src/report.ts](../src/report.ts): Terminal- und Markdown-Rendering
+- [src/app.test.ts](../src/app.test.ts): fokussierte Tests
+
+Diese Aufteilung war bewusst: Scoring, I/O, Reporting und CLI lassen sich dadurch separat pruefen und in einem Live-Walkthrough leichter erweitern.
+
+## Bewusst nicht umgesetzt
+
+Die Challenge nennt Stretch-Goals wie UI, Live-API-Anbindung, Eval-Set, Alert-Export und Deployment. Wegen der 2-4h-Regel wurden nur sinnvolle, kleine Erweiterungen umgesetzt:
+
+- CSV-Support
+- JSON-Output fuer weitere Verarbeitung
+- Markdown-Report
+- Eval-Set
+- GitHub Actions
+- robuste Datenqualitaetslogik
+
+Nicht umgesetzt, aber als naechste Schritte sinnvoll:
+
+- `--live`-Flag fuer World Bank WGI, UN Comtrade und EU-Sanktionsliste mit deterministischem Seed-Fallback
+- optionaler Ollama-Modus fuer bessere Begruendungstexte, aber nicht fuer die finale Score-Entscheidung
+- n8n-Workflow, der periodisch Daten zieht, das CLI/API aufruft und Reports/Alerts versendet
+- einfache UI fuer Upload, Ranking-Tabelle, Detailansicht und Export
+- Alert-Export fuer rote/gelbe Lieferanten
+- Deployment als kleiner HTTP-Service
+
+Wichtig: Die finale Ampel sollte auch bei LLM- oder n8n-Erweiterungen deterministisch im Scoring-Code bleiben. Ein LLM waere eher fuer Text, Zusammenfassung und Recherche-Evidenz geeignet.
+
+## AI-Collaboration / Prozess
+
+KI wurde genutzt fuer:
+
+- Strukturierung der offenen Anforderungen
+- Refactoring in Module
+- Diskussion der Gewichtung und Schwellen
+- Review von Edge Cases bei Missing Values
+- Generierung und Schaerfung sinnvoller Tests
+- README-/Decision-Log-Formulierung
+
+Die fachlichen Entscheidungen wurden anschliessend explizit im Code, in Tests und in dieser Dokumentation festgehalten. Das war bewusst wichtiger als eine groessere UI oder eine breite Stretch-Implementierung.
+
+## Walkthrough-Hinweis
+
+Fuer einen 3-5-Minuten-Walkthrough bietet sich diese Reihenfolge an:
+
+1. Kurz Ziel erklaeren: deterministischer First-Pass Lieferketten-Check.
+2. `npm start` zeigen.
+3. `npm start -- --input data/suppliers.csv --json` zeigen.
+4. `npm test` und `npm run typecheck` zeigen.
+5. Kurz [src/config.ts](../src/config.ts), [src/scoring.ts](../src/scoring.ts), [data/eval-set.json](../data/eval-set.json) und [dev/code-review/REVIEW.md](./code-review/REVIEW.md) erklaeren.
+6. Erwaehnen, dass Live-API, n8n, Ollama und UI bewusst als Erweiterungen dokumentiert, aber nicht ueberinvestiert wurden.
+
+## Navigation
+
+- [Zurueck zum Root README](../README.md)
+- [Zur Teil-B-Code-Review-Antwort](./code-review/REVIEW.md)
+- [Zur Developer-Challenge](./Challenge.md)
+- [Zum Decision Log](../DECISION_LOG.md)
+- [Zum Self Report](../SELF_REPORT.md)
