@@ -38,6 +38,9 @@ Dieses Log dokumentiert die wichtigsten Entscheidungen, Trade-offs und KI-Schrit
 17. **Live-Fallback pro Dimension:** WGI, EU FSF und Comtrade laufen im normalen `--live`-Run unabhaengig. Wenn eine Quelle scheitert, bleibt nur diese Dimension auf dem Seed-Wert; der Report laeuft weiter. Probe-Modi bleiben bewusst strikt und duerfen Fehler sichtbar machen.
 18. **Report dokumentiert Datenherkunft:** Markdown- und Konsolenreport enthalten `Datenquellen`. Dort steht, welche Dimension live ersetzt wurde und welche Dimension wegen Fehlern beim Seed-Fallback blieb.
 19. **Request-Timeouts fuer Live-APIs:** WGI und Comtrade haben kurze Timeouts. Dadurch blockiert ein haengender Endpoint nicht den ganzen Report, sondern fuehrt zu einem gefangenen Fallback.
+20. **Comtrade-X/Y explizit geklaert:** `handels_exposure` ist `X / Y * 100`, wobei `X` die Summe der Comtrade-`primaryValue`-Importe des Reporter-Landes aus dem Supplier-Land fuer den HS-Code ist und `Y` die Summe der Reporter-Weltimporte fuer denselben HS-Code. Das Supplier-Feld `handelsvolumen_eur_jahr` fliesst nicht in diese Live-Formel ein.
+21. **Comtrade-Reporter auf Oesterreich gesetzt:** Das "where we are from" ist der Comtrade-Reporter. Der Default wurde von Deutschland (`276`) auf Oesterreich (`40`) geaendert, damit ein normaler `--live`-Lauf die Importabhaengigkeit aus oesterreichischer Sicht berechnet.
+22. **Comtrade-Defaultjahr auf 2024 gesetzt:** WGI nutzt ohne `--wgi-year` weiterhin den neuesten verfuegbaren World-Bank-Wert, EU FSF nutzt die aktuelle publizierte Liste ohne Jahrparameter, aber Comtrade hat ein fixes Defaultjahr. Dieses Defaultjahr wurde von `2023` auf `2024` geaendert.
 
 ## LLM-/Ollama-Entscheidungen
 
@@ -91,6 +94,10 @@ Die folgenden Prompts sind sinngemaess aus dem Arbeitsverlauf zusammengefasst:
 32. **Strukturierte Outputs:** "Does the current implementation utilize the options of ollama to force json outputs... update this." Daraus wurde generisches `format: "json"` durch schema-basiertes `format` nach Ollama Structured Outputs ersetzt.
 33. **Werte in LLM-Erklaerungen:** "in the Explanations per Lieferant the model should mention the values, that justified the rating." Daraus entstand die Prompt-Regel, Score, Ampel und Top-Treiber-Werte in jeder Supplier-Begruendung zu nennen.
 34. **AI-Transparenz:** "add information to all LLM generated text, that it was AI generated.. like after each text block (AI generated)." Daraus wurde ein Marker an Portfolio-Brief, LLM-Begruendung und LLM-Empfehlung angehaengt.
+35. **Comtrade-Formel klaeren:** "How is the handels_exposure computed in live mode? if X/Y what is X and what is Y?" Daraus wurde die Formel als Reporter-Importanteil dokumentiert: Partnerimporte durch Weltimporte fuer denselben HS-Code.
+36. **Reporter-Land klaeren und aendern:** "Which country does it use for 'where we are from'?" und danach "Make it austria." Daraus wurde `DEFAULT_COMTRADE_REPORTER_CODE` von `276` auf `40` geaendert.
+37. **Live-Jahre klaeren:** "What are the standard years it fetches for the Live APIs?" Daraus wurde festgehalten: WGI = latest available, EU FSF = aktuelle Liste per RSS/CSV, Comtrade = fixes Defaultjahr.
+38. **Comtrade-Jahr aendern:** "For comtrade change it to 2024." Daraus wurde `DEFAULT_COMTRADE_YEAR` von `2023` auf `2024` geaendert und die README-Beispiele wurden angepasst.
 
 ## Trade-offs bewusst geschnitten
 
