@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { createAlertReport } from "./alerts";
 import { parseCliArgs } from "./cli";
-import { DEFAULT_CONFIG, DEFAULT_INPUT_PATH } from "./config";
+import { DEFAULT_CONFIG, DEFAULT_INPUT_PATH, DEFAULT_LLM_CONFIG } from "./config";
 import {
   loadSuppliers,
   writeTimestampedAlertReport,
@@ -13,6 +13,11 @@ import {
 } from "./io";
 import { renderMarkdownReport } from "./report";
 import { assessSupplier, assessSuppliers } from "./scoring";
+import {
+  DEFAULT_COMTRADE_CONCURRENCY,
+  DEFAULT_COMTRADE_REPORTER_CODE,
+  DEFAULT_COMTRADE_YEAR,
+} from "./unComtradePreview";
 import { validateSupplier } from "./validation";
 import type { RiskConfig, RiskDimensionKey, Supplier, TrafficLight } from "./types";
 
@@ -80,15 +85,15 @@ describe("Lieferketten-Check-Challenge PoC", () => {
       live: false,
       wgiProbeCountries: [],
       euSanctionsProbeCountries: [],
-      comtradeYear: 2023,
-      comtradeReporterCode: 276,
-      comtradeConcurrency: 3,
+      comtradeYear: DEFAULT_COMTRADE_YEAR,
+      comtradeReporterCode: DEFAULT_COMTRADE_REPORTER_CODE,
+      comtradeConcurrency: DEFAULT_COMTRADE_CONCURRENCY,
       llm: false,
-      llmBackend: "ollama",
-      llmBaseUrl: "http://localhost:11434",
-      llmModel: "qwen3:14b",
-      llmBatchSize: 6,
-      llmTimeoutMs: 120000,
+      llmBackend: DEFAULT_LLM_CONFIG.backend,
+      llmBaseUrl: DEFAULT_LLM_CONFIG.baseUrl,
+      llmModel: DEFAULT_LLM_CONFIG.model,
+      llmBatchSize: DEFAULT_LLM_CONFIG.batchSize,
+      llmTimeoutMs: DEFAULT_LLM_CONFIG.timeoutMs,
     });
 
     expect(
@@ -104,9 +109,9 @@ describe("Lieferketten-Check-Challenge PoC", () => {
       live: false,
       wgiProbeCountries: [],
       euSanctionsProbeCountries: [],
-      comtradeYear: 2023,
-      comtradeReporterCode: 276,
-      comtradeConcurrency: 3,
+      comtradeYear: DEFAULT_COMTRADE_YEAR,
+      comtradeReporterCode: DEFAULT_COMTRADE_REPORTER_CODE,
+      comtradeConcurrency: DEFAULT_COMTRADE_CONCURRENCY,
     });
 
     expect(parseCliArgs([], { npm_config_markdown: "" })).toMatchObject({
@@ -118,9 +123,9 @@ describe("Lieferketten-Check-Challenge PoC", () => {
       live: false,
       wgiProbeCountries: [],
       euSanctionsProbeCountries: [],
-      comtradeYear: 2023,
-      comtradeReporterCode: 276,
-      comtradeConcurrency: 3,
+      comtradeYear: DEFAULT_COMTRADE_YEAR,
+      comtradeReporterCode: DEFAULT_COMTRADE_REPORTER_CODE,
+      comtradeConcurrency: DEFAULT_COMTRADE_CONCURRENCY,
     });
 
     expect(parseCliArgs(["--alerts", "--alert-threshold", "gelb"], {})).toMatchObject({

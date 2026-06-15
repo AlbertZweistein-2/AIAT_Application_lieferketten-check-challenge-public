@@ -112,7 +112,7 @@ data/suppliers.json
     --comtrade-probe <reporter,partner,hs>
                           With --live: fetch only UN Comtrade Preview import exposure for M49 reporter/partner and HS code
     --comtrade-year <year> Comtrade year for live scoring/--comtrade-probe; defaults to 2023
-    --comtrade-reporter <m49> Reporter M49 for live Comtrade scoring; defaults to 276
+    --comtrade-reporter <m49> Reporter M49 for live Comtrade scoring; defaults to 40
     --comtrade-concurrency <n> Parallel Comtrade requests for live scoring; defaults to 3
     --llm                Enrich report text with local Ollama JSON output
     --no-llm             Disable LLM enrichment
@@ -167,8 +167,8 @@ npm start -- --live --wgi-probe AT,DE,CN --wgi-year 2024
 npm start -- --live --eu-sanctions-probe RU,CN,DE
 
 # Nur UN-Comtrade-Preview-Handels-Exposure live testen, ohne Supplier-Scoring
-# Beispiel: Deutschland (276) importiert HS 85 aus China (156)
-npm start -- --live --comtrade-probe 276,156,85 --comtrade-year 2023
+# Beispiel: Oesterreich (40) importiert HS 85 aus China (156)
+npm start -- --live --comtrade-probe 40,156,85 --comtrade-year 2023
 
 # Markdown-Report mit lokalem Ollama-Kurzbrief und LLM-Erklaerungen erzeugen
 npm start -- --llm --llm-model qwen3:14b
@@ -240,7 +240,7 @@ Der Public-Preview-Endpunkt liefert keine einzelne Aggregatzeile, sondern bis zu
 500 Detailzeilen nach `partner2`, Zoll- und Transport-Dimensionen. Der Client
 summiert deshalb `primaryValue` ueber die gelieferten Zeilen, dedupliziert
 Supplier nach `land_m49` und `hs_code` und cached die Reporter-Weltimporte je
-HS-Code. Default-Reporter ist Deutschland (`276`), per `--comtrade-reporter`
+HS-Code. Default-Reporter ist Oesterreich (`40`), per `--comtrade-reporter`
 umschaltbar. Comtrade-Requests laufen mit begrenzter Concurrency (Default `3`,
 per `--comtrade-concurrency` anpassbar), aber echte Netzwerk-Requests werden
 zusaetzlich leicht gethrottled, damit der Public-Preview-Endpunkt nicht durch

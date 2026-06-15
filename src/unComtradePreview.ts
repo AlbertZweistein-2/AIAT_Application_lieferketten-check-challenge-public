@@ -81,7 +81,7 @@ type PreviewFetchResult = {
 };
 
 export const DEFAULT_COMTRADE_YEAR = 2023;
-export const DEFAULT_COMTRADE_REPORTER_CODE = 276;
+export const DEFAULT_COMTRADE_REPORTER_CODE = 40;
 export const DEFAULT_COMTRADE_CONCURRENCY = 3;
 
 const COMTRADE_PREVIEW_BASE_URL = "https://comtradeapi.un.org/public/v1/preview";

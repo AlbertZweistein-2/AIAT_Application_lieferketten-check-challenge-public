@@ -26,7 +26,7 @@ export const DEFAULT_CONFIG: RiskConfig = {
 export const DEFAULT_LLM_CONFIG: LlmConfig = {
   backend: "ollama",
   baseUrl: "http://localhost:11434",
-  model: "qwen3:14b",
+  model: "qwen3:4b",
   batchSize: 6,
   timeoutMs: 120_000,
   prompts: {
