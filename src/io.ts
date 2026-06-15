@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { extname, join } from "node:path";
 import { validateSupplier } from "./validation";
+import type { AlertReport } from "./alerts";
 import type { RiskResult, Supplier } from "./types";
 
 export function loadSuppliers(path: string): Supplier[] {
@@ -177,6 +178,21 @@ export function writeTimestampedJsonReport(
   const reportPath = join(outputDirectory, fileName);
 
   writeFileSync(reportPath, `${JSON.stringify(results, null, 2)}\n`, "utf-8");
+
+  return reportPath;
+}
+
+export function writeTimestampedAlertReport(
+  outputDirectory: string,
+  report: AlertReport,
+  now = new Date()
+): string {
+  mkdirSync(outputDirectory, { recursive: true });
+
+  const fileName = `lieferketten-alerts-${formatTimestampForFileName(now)}.json`;
+  const reportPath = join(outputDirectory, fileName);
+
+  writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf-8");
 
   return reportPath;
 }

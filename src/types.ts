@@ -31,6 +31,22 @@ export type RiskConfig = {
   outputDirectory: string;
 };
 
+export type LlmBackend = "ollama";
+
+export type LlmConfig = {
+  backend: LlmBackend;
+  baseUrl: string;
+  model?: string;
+  batchSize: number;
+  timeoutMs: number;
+  prompts: {
+    portfolioSystem: string;
+    portfolioUser: string;
+    supplierSystem: string;
+    supplierUser: string;
+  };
+};
+
 export type Supplier = {
   _hinweis?: string;
   lieferant_id: string;

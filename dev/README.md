@@ -25,8 +25,10 @@ Gebaut wurde ein deterministisches TS/Node-CLI, das:
 - eine Handlungsempfehlung erzeugt
 - eine Portfolio-Uebersicht nach Risiko sortiert ausgibt
 - Terminal-, Markdown- und optional JSON-Reports erzeugt
+- optional kompakte JSON-Alerts fuer rote oder gelbe/rote Lieferanten erzeugt
 
 Der Kern ist bewusst ohne API-Key und ohne LLM-Abhaengigkeit lauffaehig, weil die Challenge einen deterministischen Seed-Lauf verlangt.
+Optional gibt es inzwischen Stretch-Modi fuer Live-APIs (`--live`), Alerts (`--alerts`) und lokale Ollama-Texte (`--llm`). Diese Modi veraendern nicht die Grundannahme: Der normale Seed-Lauf bleibt reproduzierbar.
 
 ## Umsetzung Teil B
 
@@ -118,6 +120,8 @@ Outputs:
 - Terminal-Report standardmaessig aktiv
 - Markdown-Report standardmaessig aktiv
 - JSON-Report optional mit `--json`
+- Alert-Export optional mit `--alerts`
+- Ollama-generierter KI-Kurzbrief und Supplier-Texte optional mit `--llm`
 
 CLI-Flags:
 
@@ -127,6 +131,10 @@ CLI-Flags:
 - `--input` / `-i`
 - `--output-dir` / `-o`
 - `--help`, `-h`, `help`
+- `--alerts` / `--no-alerts`
+- `--alert-threshold rot|gelb`
+- `--llm` / `--no-llm`
+- `--llm-model`, `--llm-base-url`, `--llm-batch-size`, `--llm-timeout-ms`
 
 Markdown-Reports werden mit Timestamp geschrieben:
 
@@ -138,6 +146,12 @@ JSON-Reports werden analog geschrieben:
 
 ```text
 reports/lieferketten-check-YYYY-MM-DD_HH-MM-SS.json
+```
+
+Alert-Reports werden separat geschrieben:
+
+```text
+reports/lieferketten-alerts-YYYY-MM-DD_HH-MM-SS.json
 ```
 
 Die Ampel wird im Terminal farbig ausgegeben, wenn ANSI-Farben verfuegbar sind. Im Markdown werden die Ampel-Texte ueber HTML-Spans farbig dargestellt. Fuer Markdown-Ranking-Tabellen werden Top-Treiber kompakt mit einer Zeile pro Wert dargestellt.
@@ -169,6 +183,8 @@ Die Tests sind bewusst auf sinnvolle Kernfaelle begrenzt, weil die Challenge exp
 - Missing-/Invalid-Value-Handling
 - Report-Erzeugung
 - Eval-Set-Szenarien
+- Live-API-Adapter fuer WGI, EU FSF und Comtrade
+- Ollama-Adapter mit strukturiertem JSON-Schema-Output
 
 ## Decomposition
 
@@ -181,31 +197,80 @@ Die Implementierung wurde in kleine Module aufgeteilt:
 - [src/validation.ts](../src/validation.ts): Validierung, Missing-Marker, numerische String-Konvertierung
 - [src/scoring.ts](../src/scoring.ts): Score, Ampel, Treiber, Imputation, Empfehlungen
 - [src/report.ts](../src/report.ts): Terminal- und Markdown-Rendering
+- [src/alerts.ts](../src/alerts.ts): kompakter Alert-Export fuer nachgelagerte Workflows
+- [src/worldBankWgi.ts](../src/worldBankWgi.ts): Live-Governance-Proxy aus World Bank WGI
+- [src/euSanctions.ts](../src/euSanctions.ts): Live-Sanktions-Proxy aus EU FSF
+- [src/unComtradePreview.ts](../src/unComtradePreview.ts): Live-Handels-Exposure aus UN Comtrade Preview
+- [src/ollama.ts](../src/ollama.ts): lokale Ollama-Texte fuer Briefing, Begruendung und Empfehlung
+- [src/llmConfigFile.ts](../src/llmConfigFile.ts): Persistenz fuer das zuletzt konfigurierte Ollama-Modell
 - [src/app.test.ts](../src/app.test.ts): fokussierte Tests
 
 Diese Aufteilung war bewusst: Scoring, I/O, Reporting und CLI lassen sich dadurch separat pruefen und in einem Live-Walkthrough leichter erweitern.
 
+## Live-API-Stretch
+
+Der Seed-Lauf bleibt der deterministische Kern. Live-Daten sind nur mit `--live`
+aktiv und ersetzen dann einzelne Risiko-Dimensionen:
+
+- World Bank WGI ersetzt `geopolitik_governance`
+- EU FSF ersetzt `sanktions_exposure`
+- UN Comtrade Preview ersetzt `handels_exposure`
+
+Im normalen Scoring-Lauf ist jeder Live-Schritt separat gehaertet. Wenn WGI, EU
+FSF oder Comtrade nicht erreichbar ist, unerwartete Daten liefert oder beim
+Anwenden auf Supplier scheitert, bleibt nur diese Dimension auf dem Seed-Wert
+und der Report laeuft weiter. Markdown- und Konsolenreport nennen im Abschnitt
+`Datenquellen`, welche Dimension live war und wo ein Seed-Fallback genutzt wurde.
+
+Die Diagnose-Modi sind bewusst anders: `--live --wgi-probe ...`,
+`--live --eu-sanctions-probe ...` und `--live --comtrade-probe ...` brechen bei
+API- oder Parse-Fehlern sichtbar ab. Sie sollen externe Quellen isoliert testen,
+nicht still in einen Seed-Report uebergehen.
+
+## Ollama-/LLM-Stretch
+
+Mit `--llm` wird nach dem deterministischen Scoring ein lokales Ollama-Modell
+fuer narrative Texte genutzt:
+
+- `KI-Kurzbrief` am Anfang des Markdown-Reports
+- `Begruendung` je Lieferant
+- `Empfehlung` je Lieferant
+
+Das LLM darf keine Scores, Ampeln, Treiber oder Datenqualitaetsnotizen
+veraendern. Diese Werte bleiben aus dem TypeScript-Scoring. Die Supplier-Texte
+werden in Batches erzeugt, nicht mit einem Prompt pro Lieferant. Die Ollama-
+Requests nutzen schema-basiertes `format` fuer strukturierte JSON-Ausgabe und
+`temperature: 0`.
+
+Die Prompts, das Default-Modell und Ollama-Parameter liegen in
+[src/config.ts](../src/config.ts). Wenn per `--llm-model` ein anderes Modell
+angegeben wird, wird es als neuer Config-Default persistiert. Wenn kein Modell
+konfiguriert ist, versucht das Tool `ollama list`, laesst interaktiv waehlen und
+speichert diese Auswahl. Wenn Ollama nicht erreichbar ist oder ungueltige JSON-
+Antworten liefert, bleiben die regelbasierten Texte erhalten. Jeder LLM-
+generierte Textblock wird mit `(AI generated)` markiert.
+
 ## Bewusst nicht umgesetzt
 
-Die Challenge nennt Stretch-Goals wie UI, Live-API-Anbindung, Eval-Set, Alert-Export und Deployment. Wegen der 2-4h-Regel wurden nur sinnvolle, kleine Erweiterungen umgesetzt:
+Die Challenge nennt Stretch-Goals wie UI, Live-API-Anbindung, Eval-Set, Alert-Export und Deployment. Wegen der 2-4h-Regel wurden nur sinnvolle Erweiterungen umgesetzt, die den CLI-Kern nicht verdecken:
 
 - CSV-Support
 - JSON-Output fuer weitere Verarbeitung
 - Markdown-Report
+- Alert-Export fuer rote bzw. gelbe/rote Lieferanten
 - Eval-Set
+- Live-API-Stretch fuer World Bank WGI, EU FSF und UN Comtrade Preview
+- Ollama-Stretch fuer KI-Kurzbrief und markierte Supplier-Texte
 - GitHub Actions
 - robuste Datenqualitaetslogik
 
 Nicht umgesetzt, aber als naechste Schritte sinnvoll:
 
-- `--live`-Flag fuer World Bank WGI, UN Comtrade und EU-Sanktionsliste mit deterministischem Seed-Fallback
-- optionaler Ollama-Modus fuer bessere Begruendungstexte, aber nicht fuer die finale Score-Entscheidung
 - n8n-Workflow, der periodisch Daten zieht, das CLI/API aufruft und Reports/Alerts versendet
 - einfache UI fuer Upload, Ranking-Tabelle, Detailansicht und Export
-- Alert-Export fuer rote/gelbe Lieferanten
 - Deployment als kleiner HTTP-Service
 
-Wichtig: Die finale Ampel sollte auch bei LLM- oder n8n-Erweiterungen deterministisch im Scoring-Code bleiben. Ein LLM waere eher fuer Text, Zusammenfassung und Recherche-Evidenz geeignet.
+Wichtig: Die finale Ampel bleibt auch mit LLM- oder n8n-Erweiterungen deterministisch im Scoring-Code. Das LLM wird nur fuer Text und Zusammenfassung genutzt.
 
 ## AI-Collaboration / Prozess
 
@@ -217,6 +282,7 @@ KI wurde genutzt fuer:
 - Review von Edge Cases bei Missing Values
 - Generierung und Schaerfung sinnvoller Tests
 - README-/Decision-Log-Formulierung
+- Ollama-Integration mit strukturiertem Output und klarer Trennung zwischen deterministischem Score und generiertem Text
 
 Die fachlichen Entscheidungen wurden anschliessend explizit im Code, in Tests und in dieser Dokumentation festgehalten. Das war bewusst wichtiger als eine groessere UI oder eine breite Stretch-Implementierung.
 
@@ -227,9 +293,11 @@ Fuer einen 3-5-Minuten-Walkthrough bietet sich diese Reihenfolge an:
 1. Kurz Ziel erklaeren: deterministischer First-Pass Lieferketten-Check.
 2. `npm start` zeigen.
 3. `npm start -- --input data/suppliers.csv --json` zeigen.
-4. `npm test` und `npm run typecheck` zeigen.
-5. Kurz [src/config.ts](../src/config.ts), [src/scoring.ts](../src/scoring.ts), [data/eval-set.json](../data/eval-set.json) und [dev/code-review/REVIEW.md](./code-review/REVIEW.md) erklaeren.
-6. Erwaehnen, dass Live-API, n8n, Ollama und UI bewusst als Erweiterungen dokumentiert, aber nicht ueberinvestiert wurden.
+4. Optional `npm start -- --alerts --no-console --no-markdown` zeigen.
+5. Optional `npm start -- --llm` zeigen, wenn Ollama lokal laeuft.
+6. `npm test` und `npm run typecheck` zeigen.
+7. Kurz [src/config.ts](../src/config.ts), [src/scoring.ts](../src/scoring.ts), [data/eval-set.json](../data/eval-set.json) und [dev/code-review/REVIEW.md](./code-review/REVIEW.md) erklaeren.
+8. Erwaehnen, dass UI, n8n, Live-News und Deployment bewusst nicht ueberinvestiert wurden.
 
 ## Navigation
 

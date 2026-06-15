@@ -2,9 +2,15 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "no
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { createAlertReport } from "./alerts";
 import { parseCliArgs } from "./cli";
 import { DEFAULT_CONFIG, DEFAULT_INPUT_PATH } from "./config";
-import { loadSuppliers, writeTimestampedJsonReport, writeTimestampedMarkdownReport } from "./io";
+import {
+  loadSuppliers,
+  writeTimestampedAlertReport,
+  writeTimestampedJsonReport,
+  writeTimestampedMarkdownReport,
+} from "./io";
 import { renderMarkdownReport } from "./report";
 import { assessSupplier, assessSuppliers } from "./scoring";
 import { validateSupplier } from "./validation";
@@ -68,7 +74,21 @@ describe("Lieferketten-Check-Challenge PoC", () => {
       printConsole: true,
       writeMarkdown: true,
       writeJson: false,
+      writeAlerts: false,
+      alertThreshold: "rot",
       showHelp: false,
+      live: false,
+      wgiProbeCountries: [],
+      euSanctionsProbeCountries: [],
+      comtradeYear: 2023,
+      comtradeReporterCode: 276,
+      comtradeConcurrency: 3,
+      llm: false,
+      llmBackend: "ollama",
+      llmBaseUrl: "http://localhost:11434",
+      llmModel: "qwen3:14b",
+      llmBatchSize: 6,
+      llmTimeoutMs: 120000,
     });
 
     expect(
@@ -78,17 +98,76 @@ describe("Lieferketten-Check-Challenge PoC", () => {
       printConsole: false,
       writeMarkdown: true,
       writeJson: true,
+      writeAlerts: false,
+      alertThreshold: "rot",
       showHelp: false,
+      live: false,
+      wgiProbeCountries: [],
+      euSanctionsProbeCountries: [],
+      comtradeYear: 2023,
+      comtradeReporterCode: 276,
+      comtradeConcurrency: 3,
     });
 
     expect(parseCliArgs([], { npm_config_markdown: "" })).toMatchObject({
       writeMarkdown: false,
       printConsole: true,
+      writeAlerts: false,
+      alertThreshold: "rot",
       showHelp: false,
+      live: false,
+      wgiProbeCountries: [],
+      euSanctionsProbeCountries: [],
+      comtradeYear: 2023,
+      comtradeReporterCode: 276,
+      comtradeConcurrency: 3,
     });
 
+    expect(parseCliArgs(["--alerts", "--alert-threshold", "gelb"], {})).toMatchObject({
+      writeAlerts: true,
+      alertThreshold: "gelb",
+    });
+
+    expect(() => parseCliArgs(["--alert-threshold", "grün"], {})).toThrow(
+      'Invalid value for --alert-threshold. Use "rot" or "gelb".'
+    );
+
     expect(() => parseCliArgs(["--no-console", "--no-markdown"], {})).toThrow(
-      "At least one output must be enabled: console, markdown, or json."
+      "At least one output must be enabled: console, markdown, json, or alerts."
+    );
+  });
+
+  it("supports opt-in Ollama report enrichment options", () => {
+    expect(
+      parseCliArgs(
+        [
+          "--llm",
+          "--llm-model",
+          "qwen3:14b",
+          "--llm-base-url",
+          "http://localhost:11434",
+          "--llm-batch-size",
+          "4",
+          "--llm-timeout-ms",
+          "60000",
+        ],
+        {}
+      )
+    ).toMatchObject({
+      llm: true,
+      llmBackend: "ollama",
+      llmModel: "qwen3:14b",
+      llmBaseUrl: "http://localhost:11434",
+      llmBatchSize: 4,
+      llmTimeoutMs: 60000,
+    });
+
+    expect(parseCliArgs(["--llm", "--no-llm"], {})).toMatchObject({
+      llm: false,
+    });
+
+    expect(() => parseCliArgs(["--llm-backend", "openai"], {})).toThrow(
+      'Invalid value for --llm-backend. Only "ollama" is supported.'
     );
   });
 
@@ -96,6 +175,80 @@ describe("Lieferketten-Check-Challenge PoC", () => {
     expect(parseCliArgs(["--help"], {})).toMatchObject({ showHelp: true });
     expect(parseCliArgs(["-h"], {})).toMatchObject({ showHelp: true });
     expect(parseCliArgs(["help"], {})).toMatchObject({ showHelp: true });
+  });
+
+  it("supports a WGI-only probe mode", () => {
+    expect(parseCliArgs(["--live", "--wgi-probe", "AT,DE,CHN", "--wgi-year", "2024"], {})).toMatchObject({
+      live: true,
+      wgiProbeCountries: ["AT", "DE", "CHN"],
+      wgiYear: 2024,
+    });
+
+    expect(
+      parseCliArgs(["--wgi-probe", "AT,DE", "--no-console", "--no-markdown"], {
+        npm_config_live: "true",
+      })
+    ).toMatchObject({
+      live: true,
+      wgiProbeCountries: ["AT", "DE"],
+      printConsole: false,
+      writeMarkdown: false,
+    });
+
+    expect(() => parseCliArgs(["--wgi-probe", "AT,DE"], {})).toThrow(
+      "Live API probing requires --live."
+    );
+  });
+
+  it("supports an EU sanctions-only probe mode", () => {
+    expect(parseCliArgs(["--live", "--eu-sanctions-probe", "RU,CN,DE"], {})).toMatchObject({
+      live: true,
+      euSanctionsProbeCountries: ["RU", "CN", "DE"],
+    });
+
+    expect(() => parseCliArgs(["--eu-sanctions-probe", "RU,CN"], {})).toThrow(
+      "Live API probing requires --live."
+    );
+  });
+
+  it("supports a UN Comtrade Preview probe mode", () => {
+    expect(
+      parseCliArgs(
+        ["--live", "--comtrade-probe", "276,156,85", "--comtrade-year", "2023"],
+        {}
+      )
+    ).toMatchObject({
+      live: true,
+      comtradeProbe: {
+        reporterCode: 276,
+        partnerCode: 156,
+        cmdCode: "85",
+      },
+      comtradeYear: 2023,
+    });
+
+    expect(parseCliArgs(["--live", "--comtrade-reporter", "40"], {})).toMatchObject({
+      live: true,
+      comtradeReporterCode: 40,
+    });
+    expect(parseCliArgs(["--live", "--comtrade-concurrency", "2"], {})).toMatchObject({
+      live: true,
+      comtradeConcurrency: 2,
+    });
+
+    expect(() => parseCliArgs(["--comtrade-probe", "276,156,85"], {})).toThrow(
+      "Live API probing requires --live."
+    );
+
+    expect(() => parseCliArgs(["--live", "--comtrade-probe", "276,156"], {})).toThrow(
+      "Invalid --comtrade-probe value"
+    );
+    expect(() => parseCliArgs(["--live", "--comtrade-reporter", "DE"], {})).toThrow(
+      "Invalid value for --comtrade-reporter"
+    );
+    expect(() => parseCliArgs(["--live", "--comtrade-concurrency", "0"], {})).toThrow(
+      "Invalid value for --comtrade-concurrency"
+    );
   });
 
   it("keeps high-risk suppliers at the top", () => {
@@ -281,7 +434,7 @@ describe("Lieferketten-Check-Challenge PoC", () => {
     expect(result.datenqualitaet.join(" ")).toContain("not-a-number");
   });
 
-  it("writes Markdown and JSON reports for downstream processing", () => {
+  it("writes Markdown, JSON, and alert reports for downstream processing", () => {
     const tempDirectory = mkdtempSync(join(tmpdir(), "lieferketten-check-"));
     tempDirectories.push(tempDirectory);
 
@@ -290,7 +443,12 @@ describe("Lieferketten-Check-Challenge PoC", () => {
     const markdown = renderMarkdownReport(
       results,
       DEFAULT_CONFIG,
-      new Date("2026-06-14T12:00:00.000Z")
+      new Date("2026-06-14T12:00:00.000Z"),
+      [
+        "Geopolitik/Governance: live aus World Bank WGI.",
+        "Handels-Exposure: Seed-Fallback, weil UN Comtrade Preview fehlgeschlagen ist.",
+      ],
+      "KI-Brief: Zwei Lieferanten sind rot und sollten eskaliert werden."
     );
 
     const markdownPath = writeTimestampedMarkdownReport(
@@ -303,13 +461,49 @@ describe("Lieferketten-Check-Challenge PoC", () => {
       results,
       new Date("2026-06-14T12:00:00.000Z")
     );
+    const alertReport = createAlertReport(
+      results,
+      "rot",
+      new Date("2026-06-14T12:00:00.000Z")
+    );
+    const alertPath = writeTimestampedAlertReport(
+      tempDirectory,
+      alertReport,
+      new Date("2026-06-14T12:00:00.000Z")
+    );
 
     expect(existsSync(markdownPath)).toBe(true);
     expect(readFileSync(markdownPath, "utf-8")).toContain("# Lieferketten-Check Report");
+    expect(readFileSync(markdownPath, "utf-8")).toContain("## KI-Kurzbrief");
+    expect(readFileSync(markdownPath, "utf-8")).toContain("KI-Brief: Zwei Lieferanten");
+    expect(readFileSync(markdownPath, "utf-8")).toContain("## Datenquellen");
+    expect(readFileSync(markdownPath, "utf-8")).toContain(
+      "Geopolitik/Governance: live aus World Bank WGI."
+    );
+    expect(readFileSync(markdownPath, "utf-8")).toContain(
+      "Handels-Exposure: Seed-Fallback"
+    );
     expect(existsSync(jsonPath)).toBe(true);
     expect(JSON.parse(readFileSync(jsonPath, "utf-8"))[0]).toMatchObject({
       risiko_score: 85.6,
       ampel: "rot",
+    });
+    expect(existsSync(alertPath)).toBe(true);
+    expect(JSON.parse(readFileSync(alertPath, "utf-8"))).toMatchObject({
+      threshold: "rot",
+      count: 2,
+      alerts: [
+        {
+          lieferant_id: "LF-024",
+          ampel: "rot",
+          risiko_score: 85.6,
+        },
+        {
+          lieferant_id: "LF-025",
+          ampel: "rot",
+          risiko_score: 85.6,
+        },
+      ],
     });
   });
 

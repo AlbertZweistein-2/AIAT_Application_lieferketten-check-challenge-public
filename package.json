@@ -5,6 +5,9 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "test": "vitest run",
+    "test:wgi": "vitest run src/worldBankWgi.test.ts",
+    "test:comtrade": "vitest run src/unComtradePreview.test.ts",
+    "test:sanctions": "vitest run src/euSanctions.test.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },

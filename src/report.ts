@@ -19,6 +19,9 @@ const ANSI = {
 export type ReportPaths = {
   markdown?: string;
   json?: string;
+  alerts?: string;
+  dataSources?: string[];
+  portfolioBrief?: string;
 };
 
 export function printPortfolioReport(results: RiskResult[], reportPaths: ReportPaths = {}): void {
@@ -32,12 +35,24 @@ export function printPortfolioReport(results: RiskResult[], reportPaths: ReportP
     `Ampel-Verteilung: ${color.ampel("grün")}=${distribution["grün"]}, ${color.ampel("gelb")}=${distribution["gelb"]}, ${color.ampel("rot")}=${distribution["rot"]}`
   );
 
+  if (reportPaths.dataSources && reportPaths.dataSources.length > 0) {
+    console.log(`Datenquellen: ${reportPaths.dataSources.join(" ")}`);
+  }
+
+  if (reportPaths.portfolioBrief) {
+    console.log(`KI-Kurzbrief: ${reportPaths.portfolioBrief}`);
+  }
+
   if (reportPaths.markdown) {
     console.log(`Markdown-Report: ${color.cyan(reportPaths.markdown)}`);
   }
 
   if (reportPaths.json) {
     console.log(`JSON-Report: ${color.cyan(reportPaths.json)}`);
+  }
+
+  if (reportPaths.alerts) {
+    console.log(`Alert-Export: ${color.cyan(reportPaths.alerts)}`);
   }
 
   console.log(`\n${color.bold("Top-Risiken")}`);
@@ -74,7 +89,9 @@ export function printPortfolioReport(results: RiskResult[], reportPaths: ReportP
 export function renderMarkdownReport(
   results: RiskResult[],
   config: RiskConfig,
-  generatedAt = new Date()
+  generatedAt = new Date(),
+  dataSources: string[] = [],
+  portfolioBrief?: string
 ): string {
   const distribution = countTrafficLights(results);
   const totalVolume = results.reduce(
@@ -86,12 +103,14 @@ export function renderMarkdownReport(
     "",
     `Erstellt am: ${formatDateTime(generatedAt)}`,
     "",
+    ...formatPortfolioBriefForMarkdown(portfolioBrief),
     "## Portfolio-Übersicht",
     "",
     `- Lieferanten gesamt: **${results.length}**`,
     `- Handelsvolumen gesamt: **${formatEuro(totalVolume)}**`,
     `- Ampel-Verteilung: ${AMPEL_MARKDOWN["grün"]} **${distribution["grün"]}**, ${AMPEL_MARKDOWN["gelb"]} **${distribution["gelb"]}**, ${AMPEL_MARKDOWN["rot"]} **${distribution["rot"]}**`,
     "",
+    ...formatDataSourcesForMarkdown(dataSources),
     "## Scoring-Annahmen",
     "",
     `- Geopolitik/Governance: **${formatWeight(config.weights.geopolitik_governance)}**`,
@@ -139,6 +158,27 @@ export function renderMarkdownReport(
   }
 
   return `${lines.join("\n")}\n`;
+}
+
+function formatPortfolioBriefForMarkdown(portfolioBrief: string | undefined): string[] {
+  if (!portfolioBrief) {
+    return [];
+  }
+
+  return ["## KI-Kurzbrief", "", portfolioBrief, ""];
+}
+
+function formatDataSourcesForMarkdown(dataSources: string[]): string[] {
+  if (dataSources.length === 0) {
+    return [];
+  }
+
+  return [
+    "## Datenquellen",
+    "",
+    ...dataSources.map((source) => `- ${source}`),
+    "",
+  ];
 }
 
 export function countTrafficLights(results: RiskResult[]): PortfolioDistribution {
