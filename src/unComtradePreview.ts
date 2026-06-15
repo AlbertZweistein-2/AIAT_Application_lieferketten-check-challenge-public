@@ -80,7 +80,7 @@ type PreviewFetchResult = {
   rows: ComtradePreviewRow[];
 };
 
-export const DEFAULT_COMTRADE_YEAR = 2023;
+export const DEFAULT_COMTRADE_YEAR = 2024;
 export const DEFAULT_COMTRADE_REPORTER_CODE = 40;
 export const DEFAULT_COMTRADE_CONCURRENCY = 3;
 

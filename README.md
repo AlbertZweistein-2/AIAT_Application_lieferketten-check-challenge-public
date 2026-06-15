@@ -111,7 +111,7 @@ data/suppliers.json
                           With --live: fetch only EU FSF country sanctions exposure for comma-separated ISO2 countries
     --comtrade-probe <reporter,partner,hs>
                           With --live: fetch only UN Comtrade Preview import exposure for M49 reporter/partner and HS code
-    --comtrade-year <year> Comtrade year for live scoring/--comtrade-probe; defaults to 2023
+    --comtrade-year <year> Comtrade year for live scoring/--comtrade-probe; defaults to 2024
     --comtrade-reporter <m49> Reporter M49 for live Comtrade scoring; defaults to 40
     --comtrade-concurrency <n> Parallel Comtrade requests for live scoring; defaults to 3
     --llm                Enrich report text with local Ollama JSON output
@@ -155,10 +155,10 @@ npm start -- -i data/suppliers.csv -o out
 npm start -- --live --wgi-year 2024
 
 # Live-Comtrade aus Sicht eines anderen Reporter-Landes berechnen, z. B. Österreich (40)
-npm start -- --live --comtrade-reporter 40 --comtrade-year 2023
+npm start -- --live --comtrade-reporter 40 --comtrade-year 2024
 
 # Konservativer gegen Rate-Limits: weniger parallele Comtrade-Requests
-npm start -- --live --comtrade-concurrency 1 --comtrade-year 2023
+npm start -- --live --comtrade-concurrency 1 --comtrade-year 2024
 
 # Nur World-Bank-WGI-Governance-Risiko live testen, ohne Supplier-Scoring
 npm start -- --live --wgi-probe AT,DE,CN --wgi-year 2024
@@ -168,7 +168,7 @@ npm start -- --live --eu-sanctions-probe RU,CN,DE
 
 # Nur UN-Comtrade-Preview-Handels-Exposure live testen, ohne Supplier-Scoring
 # Beispiel: Oesterreich (40) importiert HS 85 aus China (156)
-npm start -- --live --comtrade-probe 40,156,85 --comtrade-year 2023
+npm start -- --live --comtrade-probe 40,156,85 --comtrade-year 2024
 
 # Markdown-Report mit lokalem Ollama-Kurzbrief und LLM-Erklaerungen erzeugen
 npm start -- --llm --llm-model qwen3:14b
