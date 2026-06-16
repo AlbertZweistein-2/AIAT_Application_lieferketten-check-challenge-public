@@ -4,7 +4,7 @@
 
 ## Investierte Zeit
 
-Gesamtzeit: ca. `11 Stunden`
+Gesamtzeit: ca. `12 Stunden`
 
 Zeitraum: `2026-06-14` bis `2026-06-16`
 
@@ -23,6 +23,7 @@ Die Challenge nennt bewusst 2-4 fokussierte Stunden als Richtwert. Ich habe mehr
 | Dokumentation | ca. 1 h |
 | Walkthrough-Vorbereitung, Aufnahme und Schnitt | ca. 1,5 h |
 | Puffer für Debugging, Refactoring, Tests | ca. 1 h |
+| Business-Quick-Pass: DACH-Absatzpotenzial, ICP, Preislogik, Umsatzabschätzung | ca. 1 h |
 
 ## KI-Nutzung
 

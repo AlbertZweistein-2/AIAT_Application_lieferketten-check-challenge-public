@@ -2,7 +2,7 @@
 
 [Zurück zum Root README](./README.md)
 
-Dieses Log hält die wichtigsten Entscheidungen, Trade-offs und KI-Schritte für die Developer-Challenge knapp fest. Ausführliche technische Details stehen in [dev/README.md](./dev/README.md).
+Dieses Log hält die wichtigsten Entscheidungen, Trade-offs und KI-Schritte für die Developer-Challenge knapp fest. Ausführliche technische Details stehen in [dev/README.md](./dev/README.md). Der Business-Teil wurde nachträglich als knapper Quick-Pass ergänzt, weil der Schwerpunkt der Arbeit auf der Developer-Challenge lag.
 
 ## Entscheidungen
 
@@ -16,6 +16,10 @@ Dieses Log hält die wichtigsten Entscheidungen, Trade-offs und KI-Schritte für
 8. **Live-APIs als Opt-in:** `--live` ersetzt einzelne Dimensionen durch World Bank WGI, EU FSF und UN Comtrade Preview. Fällt eine Quelle im normalen Lauf aus, bleibt nur diese Dimension beim Seed-Wert; Probe-Modi brechen dagegen sichtbar ab.
 9. **Live-Proxies bewusst begrenzt:** WGI nutzt Rule of Law und Control of Corruption; EU FSF ist ein Länder-Proxy, kein Name-Matching; Comtrade ist ein Importanteils-/Konzentrationsproxy aus Reporter-Sicht, default Österreich.
 10. **Tests als Guardrails:** Tests decken Kernverhalten, CLI, Datenqualität, Reports, Eval-Set und Adapter ab, aber bewusst ohne Coverage-Theater. Ollama wird ohne echte lokale Modellabhängigkeit testbar gehalten, damit CI stabil bleibt.
+11. **Business-Case bewusst schmal gehalten:** Der Business-Nachtrag fokussiert auf Lean Canvas, DACH-bottom-up-Absatzpotenzial, ICP, Preislogik und Umsatzabschätzung. Keine Folien, keine breite Marktstudie, keine ausgedachten Unit-Economics.
+12. **DACH vor EU-TAM:** Für das Sizing wurde DACH als primärer Beachhead gewählt. Die exakte Zahl der Unternehmen mit 5000+ Mitarbeitenden und EUR 1,5 Mrd.+ Umsatz ist öffentlich nicht sauber in einer Quelle verfügbar, daher wird mit einer transparenten Named-Account-Range und Validierungslogik gearbeitet.
+13. **Preis aus Zeitersparnis statt Bauchgefühl:** EUR 990/Monat wurde gegen konservative manuelle Screening-Kosten gespiegelt: 500 Lieferanten × 30-60 Minuten × EUR 30-50/Stunde.
+14. **Prototyp-Insight als Positionierung:** `risk_adjusted_exposure` wurde im Business-Case als Differenzierung genutzt, weil es Risiko und Einkaufsvolumen verbindet und damit besser zu Procurement-Entscheidungen passt als eine reine Ampel.
 
 ## Schlüssel-Prompts / KI-Collaboration
 
@@ -41,6 +45,8 @@ KI wurde eingesetzt, um Anforderungen zu strukturieren, Code kritisch zu reviewe
 18. "How is handels_exposure computed in live mode? If X/Y, what is X and what is Y?"
 19. "Add Ollama integration behind `--llm`; keep scoring deterministic, use structured JSON output, batch supplier explanations, and mark generated text."
 20. "Document all usage in the root README and all challenge decisions in the dev README."
+21. "Fokussiere den Business-Case auf DACH statt EU-weit und recherchiere, wie viele Unternehmen in DE/AT/CH grob 5000+ Mitarbeitende und EUR 1,5 Mrd.+ Umsatz erreichen."
+22. "Begründe die Preislogik über interne Prüfungskosten, setze EUR 30-50 pro Stunde an und ergänze EUR 990/Monat mit wöchentlichem Check plus Daily-Check-Upsell für EUR 200/Monat."
 
 ## Navigation
 
