@@ -11,7 +11,6 @@ Das Tool liest eine Lieferantenliste aus JSON oder CSV, berechnet pro Lieferant 
 - [business/Challenge.md](./business/Challenge.md): originale Business-Challenge, zur Vollständigkeit im Repo behalten.
 - [dev/README.md](./dev/README.md): Developer-Notizen, Design-Entscheidungen, Scoring, Live-API- und LLM-Details.
 - [dev/code-review/REVIEW.md](./dev/code-review/REVIEW.md): **Antwort auf Teil B** der Developer-Challenge.
-- [business/NOTES.md](./business/NOTES.md): erste knappe Notizen für den Business-Teil.
 - [DECISION_LOG.md](./DECISION_LOG.md): Entscheidungen, Trade-offs und Schlüssel-Prompts.
 - [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md): Hinweise zu übernommenen Drittanbieter-Dateien.
 - [SELF_REPORT.md](./SELF_REPORT.md): Vorlage für den finalen Selbst-Report.
