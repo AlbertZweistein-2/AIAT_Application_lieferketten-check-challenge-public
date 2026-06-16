@@ -4,7 +4,7 @@
 
 ## Investierte Zeit
 
-Gesamtzeit: ca. `10 Stunden`
+Gesamtzeit: ca. `11 Stunden`
 
 Zeitraum: `2026-06-14` bis `2026-06-16`
 
@@ -21,7 +21,7 @@ Die Challenge nennt bewusst 2-4 fokussierte Stunden als Richtwert. Ich habe mehr
 | Ollama-/LLM-Stretch | ca. 1 h |
 | Input-/Output-Erweiterungen | ca. 0,5 h |
 | Dokumentation | ca. 1 h |
-| Walkthrough-Vorbereitung und Aufnahme | ca. 0,5 h |
+| Walkthrough-Vorbereitung, Aufnahme und Schnitt | ca. 1,5 h |
 | Puffer für Debugging, Refactoring, Tests | ca. 1 h |
 
 ## KI-Nutzung
@@ -29,6 +29,7 @@ Die Challenge nennt bewusst 2-4 fokussierte Stunden als Richtwert. Ich habe mehr
 Genutzte Tools:
 
 - OpenAI Codex
+- OpenAi Codex Mobile
 - Claude Code
 - GitHub Copilot
 
