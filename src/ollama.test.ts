@@ -7,7 +7,7 @@ import {
   parseJsonObjectFromModelOutput,
   parseOllamaListOutput,
 } from "./ollama";
-import { updateDefaultLlmModelSource } from "./llmConfigFile";
+import { updateLocalLlmModelSource } from "./llmConfigFile";
 import { assessSuppliers } from "./scoring";
 import type { Supplier } from "./types";
 
@@ -96,28 +96,20 @@ describe("Ollama report enrichment", () => {
     );
   });
 
-  it("updates the default model inside DEFAULT_LLM_CONFIG source", () => {
-    const source = [
-      'import type { LlmConfig } from "./types";',
-      "",
-      "export const DEFAULT_LLM_CONFIG: LlmConfig = {",
-      '  backend: "ollama",',
-      '  baseUrl: "http://localhost:11434",',
-      '  model: "old:model",',
-      "  batchSize: 6,",
-      "  timeoutMs: 120_000,",
-      "  prompts: {",
-      '    portfolioSystem: "x",',
-      '    portfolioUser: "x",',
-      '    supplierSystem: "x",',
-      '    supplierUser: "x",',
-      "  },",
-      "};",
-    ].join("\n");
+  it("updates the model inside local LLM config JSON", () => {
+    const source = JSON.stringify({
+      llm: {
+        baseUrl: "http://localhost:11434",
+        model: "old:model",
+      },
+    });
 
-    expect(updateDefaultLlmModelSource(source, "qwen3:14b")).toContain(
-      '  model: "qwen3:14b",'
-    );
+    expect(JSON.parse(updateLocalLlmModelSource(source, "qwen3:14b"))).toEqual({
+      llm: {
+        baseUrl: "http://localhost:11434",
+        model: "qwen3:14b",
+      },
+    });
   });
 });
 

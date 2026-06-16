@@ -303,6 +303,42 @@ describe("Lieferketten-Check-Challenge PoC", () => {
     ]);
   });
 
+  it("uses risk-adjusted exposure as secondary sort value for tied risk scores", () => {
+    const lowVolume = createSupplier(
+      {
+        geopolitik_governance: 40,
+        sanktions_exposure: 40,
+        handels_exposure: 40,
+      },
+      {
+        lieferant_id: "LOW-VOLUME",
+        handelsvolumen_eur_jahr: 1000,
+      }
+    );
+    const highVolume = createSupplier(
+      {
+        geopolitik_governance: 40,
+        sanktions_exposure: 40,
+        handels_exposure: 40,
+      },
+      {
+        lieferant_id: "HIGH-VOLUME",
+        handelsvolumen_eur_jahr: 100000,
+      }
+    );
+
+    const results = assessSuppliers([lowVolume, highVolume], DEFAULT_CONFIG);
+
+    expect(results.map((result) => result.supplier.lieferant_id)).toEqual([
+      "HIGH-VOLUME",
+      "LOW-VOLUME",
+    ]);
+    expect(results[0].risiko_score).toBe(results[1].risiko_score);
+    expect(results[0].risk_adjusted_exposure).toBeGreaterThan(
+      results[1].risk_adjusted_exposure
+    );
+  });
+
   it("uses configured trade exposure threshold for minimum yellow", () => {
     const supplier = createSupplier({
       geopolitik_governance: 5,
@@ -321,6 +357,7 @@ describe("Lieferketten-Check-Challenge PoC", () => {
 
     expect(result.risiko_score).toBe(20);
     expect(result.ampel).toBe("gelb");
+    expect(result.risk_adjusted_exposure).toBe(200);
     expect(result.begruendung).toContain("Diversifikation");
   });
 
@@ -368,6 +405,83 @@ describe("Lieferketten-Check-Challenge PoC", () => {
     expect(imputedResult?.datenqualitaet.join(" ")).toContain(
       "Sanktions-Exposure fehlte"
     );
+    expect(imputedResult?.datenqualitaet.join(" ")).toContain("Länder-Median");
+  });
+
+  it("imputes missing trade exposure from same-country and same-HS peers first", () => {
+    const sameCountrySameHs = createSupplier(
+      {
+        geopolitik_governance: 20,
+        sanktions_exposure: 10,
+        handels_exposure: 30,
+      },
+      { lieferant_id: "SAME-HS", land_iso2: "AT", land_name: "Österreich", hs_code: "72" }
+    );
+    const sameCountryDifferentHs = createSupplier(
+      {
+        geopolitik_governance: 20,
+        sanktions_exposure: 10,
+        handels_exposure: 90,
+      },
+      { lieferant_id: "OTHER-HS", land_iso2: "AT", land_name: "Österreich", hs_code: "85" }
+    );
+    const missingTrade = createSupplier(
+      {
+        geopolitik_governance: 20,
+        sanktions_exposure: 10,
+      },
+      { lieferant_id: "MISSING-TRADE", land_iso2: "AT", land_name: "Österreich", hs_code: "72" }
+    );
+
+    const results = assessSuppliers(
+      [sameCountrySameHs, sameCountryDifferentHs, missingTrade],
+      DEFAULT_CONFIG
+    );
+    const imputedResult = results.find(
+      (result) => result.supplier.lieferant_id === "MISSING-TRADE"
+    );
+
+    expect(imputedResult?.supplier.risiko_dimensionen.handels_exposure).toBe(30);
+    expect(imputedResult?.datenqualitaet.join(" ")).toContain("HS 72");
+    expect(imputedResult?.datenqualitaet.join(" ")).not.toContain("Fallback");
+  });
+
+  it("falls back to same-country median for missing trade exposure when no same-HS peer exists", () => {
+    const differentHsLow = createSupplier(
+      {
+        geopolitik_governance: 20,
+        sanktions_exposure: 10,
+        handels_exposure: 30,
+      },
+      { lieferant_id: "OTHER-HS-LOW", land_iso2: "AT", land_name: "Österreich", hs_code: "72" }
+    );
+    const differentHsHigh = createSupplier(
+      {
+        geopolitik_governance: 20,
+        sanktions_exposure: 10,
+        handels_exposure: 50,
+      },
+      { lieferant_id: "OTHER-HS-HIGH", land_iso2: "AT", land_name: "Österreich", hs_code: "85" }
+    );
+    const missingTrade = createSupplier(
+      {
+        geopolitik_governance: 20,
+        sanktions_exposure: 10,
+      },
+      { lieferant_id: "MISSING-TRADE", land_iso2: "AT", land_name: "Österreich", hs_code: "39" }
+    );
+
+    const results = assessSuppliers(
+      [differentHsLow, differentHsHigh, missingTrade],
+      DEFAULT_CONFIG
+    );
+    const imputedResult = results.find(
+      (result) => result.supplier.lieferant_id === "MISSING-TRADE"
+    );
+
+    expect(imputedResult?.supplier.risiko_dimensionen.handels_exposure).toBe(40);
+    expect(imputedResult?.datenqualitaet.join(" ")).toContain("kein Peer mit gleichem Land und HS 39");
+    expect(imputedResult?.datenqualitaet.join(" ")).toContain("Fallback");
     expect(imputedResult?.datenqualitaet.join(" ")).toContain("Länder-Median");
   });
 
@@ -480,6 +594,7 @@ describe("Lieferketten-Check-Challenge PoC", () => {
 
     expect(existsSync(markdownPath)).toBe(true);
     expect(readFileSync(markdownPath, "utf-8")).toContain("# Lieferketten-Check Report");
+    expect(readFileSync(markdownPath, "utf-8")).toContain("Risiko-adjustiertes Exposure");
     expect(readFileSync(markdownPath, "utf-8")).toContain("## KI-Kurzbrief");
     expect(readFileSync(markdownPath, "utf-8")).toContain("KI-Brief: Zwei Lieferanten");
     expect(readFileSync(markdownPath, "utf-8")).toContain("## Datenquellen");
@@ -492,6 +607,7 @@ describe("Lieferketten-Check-Challenge PoC", () => {
     expect(existsSync(jsonPath)).toBe(true);
     expect(JSON.parse(readFileSync(jsonPath, "utf-8"))[0]).toMatchObject({
       risiko_score: 85.6,
+      risk_adjusted_exposure: 359520,
       ampel: "rot",
     });
     expect(existsSync(alertPath)).toBe(true);
@@ -503,6 +619,7 @@ describe("Lieferketten-Check-Challenge PoC", () => {
           lieferant_id: "LF-024",
           ampel: "rot",
           risiko_score: 85.6,
+          risk_adjusted_exposure: 359520,
         },
         {
           lieferant_id: "LF-025",

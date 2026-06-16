@@ -265,11 +265,11 @@ function logLlm(message: string): void {
 function persistLlmModelForNextRuns(model: string): void {
   try {
     if (persistDefaultLlmModel(model)) {
-      logLlm(`Saved ${model} as DEFAULT_LLM_CONFIG.model for future runs.`);
+      logLlm(`Saved ${model} in src/config.local.json for future runs.`);
     }
   } catch (error) {
     logLlm(
-      `Could not update DEFAULT_LLM_CONFIG.model in src/config.ts. ${formatErrorMessage(error)}`
+      `Could not update src/config.local.json. ${formatErrorMessage(error)}`
     );
   }
 }

@@ -77,6 +77,7 @@ export type RiskDriver = {
 export type RiskResult = {
   supplier: ScoredSupplier;
   risiko_score: number;
+  risk_adjusted_exposure: number;
   ampel: TrafficLight;
   treiber: RiskDriver[];
   begruendung: string;

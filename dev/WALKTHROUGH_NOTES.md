@@ -2,53 +2,213 @@
 
 [Zurück zum Developer README](./README.md)
 
-Kurze Notiz für den morgigen 3-5-Minuten-Walkthrough.
+Ziel: 3-5 Minuten, ein Take. Nicht alles im Detail erklären, sondern zeigen, dass das Repo frisch installierbar ist, der Kern läuft und die wichtigsten Entscheidungen nachvollziehbar dokumentiert sind.
 
-## Ablauf
+## Vorbereitung
 
-1. Ziel in einem Satz: deterministischer First-Pass Lieferketten-Check für synthetische Supplier-Daten.
-2. Kurz zeigen, dass der normale Lauf ohne API-Key und ohne LLM funktioniert:
+Vor der Aufnahme:
 
-```bash
-npm start
-```
-
-3. CSV-Input und maschinenlesbaren Export zeigen:
+- GitHub-Repo im Browser öffnen.
+- Terminal auf dem Mac in einem frischen Checkout öffnen.
+- Optional Ollama lokal starten und sicherstellen, dass ein Modell installiert ist, z. B. `qwen3:14b`.
+- Falls ein anderer Ollama-Endpoint genutzt wird, lokale Config vorbereiten:
 
 ```bash
-npm start -- --input data/suppliers.csv --json
+cp src/config.local.example.json src/config.local.json
 ```
 
-4. Optional Alerts zeigen:
+Dann in `src/config.local.json` bei Bedarf `baseUrl` und `model` setzen. Diese Datei ist gitignored.
+
+## Ablauf mit Commands
+
+### 0:00-0:30 GitHub-Seite zeigen
+
+Sagen:
+
+> This is the repository for the AI:AT Lieferketten-Check challenge. I kept the original challenge files in the repo, and the main entry points are the root README, the developer notes, the decision log, the self report and the code-review answer for part B.
+
+Kurz zeigen:
+
+- [README.md](../README.md): Installation und usage
+- [dev/README.md](./README.md): Entscheidungen, Formeln, thresholds, Live API und LLM-Details
+- [DECISION_LOG.md](../DECISION_LOG.md): kurze Entscheidungen und Schlüssel-Prompts
+- [dev/code-review/REVIEW.md](./code-review/REVIEW.md): Teil B
+
+### 0:30-1:10 Frischer Checkout und Installation
+
+Commands:
 
 ```bash
-npm start -- --alerts --no-console --no-markdown
+npm install
 ```
 
-5. Optional `--llm` zeigen, falls Ollama lokal läuft:
+Währenddessen sagen:
 
-```bash
-npm start -- --llm
-```
+> I am starting from a fresh checkout on my Mac, so the first thing is installing dependencies. The project is intentionally a TypeScript/Node CLI, not a UI, because the core challenge asks for a runnable screening agent and clear judgment, not frontend polish.
 
-6. Tests und Typecheck zeigen:
+Wenn `npm install` fertig ist:
 
 ```bash
 npm test
 npm run typecheck
 ```
 
-## Code-Stellen
+Sagen:
 
-- [src/config.ts](../src/config.ts): Gewichte, Schwellen, Defaults, LLM-Prompts
-- [src/scoring.ts](../src/scoring.ts): Score, Ampel, Top-Treiber, Datenqualität
-- [data/eval-set.json](../data/eval-set.json): kleine Guardrail-Szenarien
-- [dev/code-review/REVIEW.md](./code-review/REVIEW.md): Teil-B-Code-Review
-- [DECISION_LOG.md](../DECISION_LOG.md): Entscheidungen, Trade-offs und KI-Nutzung
+> The tests are meant as guardrails, not coverage theater. They cover input parsing, CLI options, scoring behavior, data quality handling, report generation, the small eval set, and the adapters. Typecheck makes sure the TypeScript surface stays consistent.
 
-## Sprechpunkte
+### 1:10-1:50 Seed Run
 
-- Der Seed-Lauf bleibt reproduzierbar und prüfbar.
-- Live-APIs und Ollama sind Opt-in-Stretches.
-- Die Ampel kommt immer aus deterministischem TypeScript-Scoring, nicht aus dem LLM.
-- UI, n8n, Live-News und Deployment sind bewusst als nächste Schritte dokumentiert, nicht überhastet gebaut.
+Command:
+
+```bash
+npm start
+```
+
+Sagen:
+
+> This is the deterministic seed run. It reads `data/suppliers.json`, calculates a 0-100 risk score, assigns an Ampel and writes a timestamped Markdown report. No API key and no LLM are needed for the default path.
+
+Zeigen:
+
+- Terminal summary
+- Top-Risiken table
+- erzeugten Markdown-Pfad
+
+Danach den Markdown-Report öffnen/zeigen:
+
+> The report contains the portfolio summary, data source notes, ranking, detailed supplier explanations and data-quality notes. The formulas and thresholds are documented in `dev/README.md`, especially under Scoring, Ampel logic and Data Quality.
+
+### 1:50-2:20 Output-Varianten zeigen
+
+Command:
+
+```bash
+npm start -- --json --no-console --no-markdown
+```
+
+Sagen:
+
+> The outputs are flag-controlled. Here I suppress console and Markdown and only write JSON, which is useful for downstream processing.
+
+Command:
+
+```bash
+npm start -- --alerts --no-console --no-markdown
+```
+
+Sagen:
+
+> Alerts are a compact JSON export for suppliers that need attention. That is intentionally small and workflow-friendly, for example for a later n8n, Slack, email or ticket integration.
+
+Zeigen:
+
+- `reports/lieferketten-check-...json`
+- `reports/lieferketten-alerts-...json`
+
+### 2:20-3:20 LLM Run
+
+Command, wenn `src/config.local.json` gesetzt ist:
+
+```bash
+npm start -- --llm
+```
+
+Oder direkt mit Modell:
+
+```bash
+npm start -- --llm --llm-model qwen3:14b
+```
+
+Während der Run läuft, sagen:
+
+> The LLM integration is explicitly opt-in. It uses local Ollama and structured JSON output. Important: the Ampel, scores, top drivers and data-quality notes are never generated by the LLM. They always come from deterministic TypeScript scoring. The LLM only writes the portfolio brief, the supplier reasoning text and the recommendation, and every generated text block is marked as AI generated.
+
+Config kurz zeigen:
+
+- [src/config.ts](../src/config.ts): tracked defaults, weights, thresholds, prompts
+- [src/config.local.example.json](../src/config.local.example.json): local override template
+- `src/config.local.json`: local ignored file, only if present
+
+Sagen:
+
+> The tracked config has safe defaults and no selected local model. Personal settings such as Ollama base URL and model belong in `src/config.local.json`, which is ignored by git.
+
+Nach dem Run im Markdown zeigen:
+
+- `KI-Kurzbrief`
+- `(AI generated)` Marker
+- Lieferanten-Begründung/Empfehlung
+
+### 3:20-4:20 Live API Run
+
+Command:
+
+```bash
+npm start -- --live
+```
+
+Während der Run läuft, sagen:
+
+> Live APIs are also opt-in because they are slower, rate-limited and less deterministic than the seed. The seed remains the fallback. In live mode, WGI can replace governance, EU FSF can replace sanctions exposure as a country proxy, and UN Comtrade Preview can replace trade exposure as an import-share proxy.
+
+Kurz erklären:
+
+> The live values are proxies, not a compliance audit. WGI uses Rule of Law and Control of Corruption. EU FSF is country-level list presence, not name matching, because the seed suppliers are synthetic. Comtrade is X over Y: imports from supplier country for the HS code divided by world imports for the same HS code from the reporter perspective. The default reporter is Austria.
+
+Zeigen:
+
+- `[live]` Logs im Terminal
+- Report-Abschnitt `Datenquellen`
+- Seed-Fallback-Hinweise, falls eine Quelle nicht erreichbar war
+
+### 4:20-5:00 Abschluss
+
+Sagen:
+
+> The most important design decision is separation of concerns: deterministic scoring in `scoring.ts`, config and thresholds in `config.ts`, rendering in `report.ts`, input/output in `io.ts`, and optional extensions behind flags. The formulas, thresholds and data-quality choices are documented in `dev/README.md`; the short decision log and key prompts are in `DECISION_LOG.md`.
+
+Optional kurz zeigen:
+
+- [src/scoring.ts](../src/scoring.ts): Score, Ampel, Missing Values
+- [src/report.ts](../src/report.ts): Terminal/Markdown output
+- [src/cli.ts](../src/cli.ts): Flags
+- [dev/README.md](./README.md): Detaillierte Umsetzung Teil A
+
+Letzter Satz:
+
+> So the core is reproducible and reviewable, and the stretches are deliberately kept behind flags.
+
+## Wichtige Sprechpunkte
+
+- Der Default-Run ist deterministisch und braucht weder API-Key noch LLM.
+- Die Ampel kommt immer aus TypeScript-Scoring, nie aus dem LLM.
+- LLM-Texte sind optional, lokal, strukturiert und als `(AI generated)` markiert.
+- Live APIs sind optional und haben Seed-Fallbacks.
+- Formeln und thresholds stehen in [dev/README.md](./README.md):
+  - `3.1 Scoring-Entscheidungen`
+  - `3.2 Ampel-Logik`
+  - `3.3 Datenqualität und Missing Values`
+  - `4.3 Live-API-Stretch`
+  - `4.4 Ollama-/LLM-Stretch`
+- `src/config.ts` enthält getrackte Defaults.
+- `src/config.local.json` ist für private lokale LLM-Einstellungen und wird nicht gepusht.
+- JSON-Reports und Alert-JSONs sind für Weiterverarbeitung gedacht.
+
+## Falls die Zeit knapp wird
+
+Unbedingt zeigen:
+
+1. GitHub/README
+2. `npm install`
+3. `npm test`
+4. `npm run typecheck`
+5. `npm start`
+6. Markdown-Report
+7. Kurzer Hinweis: `--llm` und `--live` sind Opt-in-Stretches
+
+Optional kürzen:
+
+- Live API nur erklären, nicht komplett abwarten.
+- LLM-Run starten und währenddessen Config/Report erklären.
+- Alert JSON nur kurz im Dateibaum zeigen.

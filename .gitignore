@@ -13,6 +13,7 @@ venv/
 # Secrets / lokale Umgebung
 .env
 .env.local
+src/config.local.json
 
 # OS / Editor
 .DS_Store

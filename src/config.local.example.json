@@ -1,0 +1,9 @@
+{
+  "llm": {
+    "backend": "ollama",
+    "baseUrl": "http://localhost:11434",
+    "model": "",
+    "batchSize": 6,
+    "timeoutMs": 120000
+  }
+}

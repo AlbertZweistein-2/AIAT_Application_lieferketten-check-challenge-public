@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import type { LlmConfig, RiskConfig, RiskDimensionKey } from "./types";
 
 // Central defaults used by the CLI, scoring, reports and optional Ollama enrichment.
@@ -24,10 +26,10 @@ export const DEFAULT_CONFIG: RiskConfig = {
   outputDirectory: "reports",
 };
 
-export const DEFAULT_LLM_CONFIG: LlmConfig = {
+const DEFAULT_LLM_CONFIG_BASE: LlmConfig = {
   backend: "ollama",
   baseUrl: "http://localhost:11434",
-  model: "qwen3:4b",
+  model: "",
   batchSize: 6,
   timeoutMs: 120_000,
   prompts: {
@@ -44,10 +46,50 @@ export const DEFAULT_LLM_CONFIG: LlmConfig = {
     supplierUser: [
       "Formuliere für jeden Lieferanten eine kurze Begründung und eine konkrete Handlungsempfehlung.",
       "Nutze die vorhandenen Scores als Fakten. Erfinde keine Live-Daten und keine Sanktions-Treffer.",
-      "Die Begründung muss die Werte nennen, die die Einstufung rechtfertigen: mindestens Risiko-Score, Ampel und die zwei wichtigsten Top-Treiber mit Rohwert und gewichtetem Beitrag.",
+      "Die Begründung muss die Werte nennen, die die Einstufung rechtfertigen: mindestens Risiko-Score, Ampel, risiko-adjustiertes Exposure und die zwei wichtigsten Top-Treiber mit Rohwert und gewichtetem Beitrag.",
       "Bei rot: klare Eskalation. Bei gelb: vertiefte Prüfung. Bei grün: Monitoring.",
       'Gib exakt dieses JSON-Format zurück: {"supplier_texts":[{"lieferant_id":"...","begruendung":"...","handlungsempfehlung":"..."}]}',
       "Lieferanten: {supplier_data}",
     ].join("\n"),
   },
 };
+
+export const DEFAULT_LLM_CONFIG: LlmConfig = mergeLlmConfigWithLocalOverrides(
+  DEFAULT_LLM_CONFIG_BASE,
+  loadLocalLlmConfig()
+);
+
+type LocalConfigFile = {
+  llm?: Partial<Omit<LlmConfig, "prompts">> & {
+    prompts?: Partial<LlmConfig["prompts"]>;
+  };
+};
+
+function loadLocalLlmConfig(configPath = "src/config.local.json"): LocalConfigFile["llm"] {
+  const resolvedPath = resolve(process.cwd(), configPath);
+
+  if (!existsSync(resolvedPath)) {
+    return undefined;
+  }
+
+  const parsed = JSON.parse(readFileSync(resolvedPath, "utf-8")) as LocalConfigFile;
+  return parsed.llm;
+}
+
+function mergeLlmConfigWithLocalOverrides(
+  baseConfig: LlmConfig,
+  localConfig?: LocalConfigFile["llm"]
+): LlmConfig {
+  if (!localConfig) {
+    return baseConfig;
+  }
+
+  return {
+    ...baseConfig,
+    ...localConfig,
+    prompts: {
+      ...baseConfig.prompts,
+      ...localConfig.prompts,
+    },
+  };
+}

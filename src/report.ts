@@ -16,6 +16,8 @@ const ANSI = {
   cyan: "\x1b[36m",
 } as const;
 
+const RISK_ADJUSTED_EXPOSURE_COLUMN_WIDTH = 18;
+
 export type ReportPaths = {
   markdown?: string;
   json?: string;
@@ -58,12 +60,15 @@ export function printPortfolioReport(results: RiskResult[], reportPaths: ReportP
 
   console.log(`\n${color.bold("Top-Risiken")}`);
   console.log(color.dim("-----------"));
+  console.log(
+    `${"ID".padEnd(6)} | ${"Score".padStart(5)} | ${"Risk-adj. Exposure".padStart(RISK_ADJUSTED_EXPOSURE_COLUMN_WIDTH)} | ${"Ampel".padEnd(5)} | Lieferant | Land | Branche`
+  );
 
   for (const result of results) {
     const s = result.supplier;
 
     console.log(
-      `${s.lieferant_id} | ${formatScore(result.risiko_score).padStart(5)} | ${color.ampel(result.ampel.padEnd(4))} | ${s.name} | ${s.land_name} | ${s.branche}`
+      `${s.lieferant_id.padEnd(6)} | ${formatScore(result.risiko_score).padStart(5)} | ${formatEuro(result.risk_adjusted_exposure).padStart(RISK_ADJUSTED_EXPOSURE_COLUMN_WIDTH)} | ${color.ampel(result.ampel.padEnd(5))} | ${s.name} | ${s.land_name} | ${s.branche}`
     );
   }
 
@@ -78,6 +83,7 @@ export function printPortfolioReport(results: RiskResult[], reportPaths: ReportP
     console.log(`Branche/Ware: ${s.branche} / ${s.ware} (HS ${s.hs_code})`);
     console.log(`Handelsvolumen: ${formatEuro(s.handelsvolumen_eur_jahr)}`);
     console.log(`Score: ${formatScore(result.risiko_score)}/100 → ${color.ampel(result.ampel)}`);
+    console.log(`Risiko-adjustiertes Exposure: ${formatEuro(result.risk_adjusted_exposure)}`);
     console.log(`Treiber: ${formatDrivers(result)}`);
     if (result.datenqualitaet.length > 0) {
       console.log(`Datenqualität: ${result.datenqualitaet.join(" ")}`);
@@ -100,6 +106,10 @@ export function renderMarkdownReport(
     (sum, result) => sum + result.supplier.handelsvolumen_eur_jahr,
     0
   );
+  const totalRiskAdjustedExposure = results.reduce(
+    (sum, result) => sum + result.risk_adjusted_exposure,
+    0
+  );
   const lines: string[] = [
     "# Lieferketten-Check Report",
     "",
@@ -110,6 +120,7 @@ export function renderMarkdownReport(
     "",
     `- Lieferanten gesamt: **${results.length}**`,
     `- Handelsvolumen gesamt: **${formatEuro(totalVolume)}**`,
+    `- Risiko-adjustiertes Exposure gesamt: **${formatEuro(totalRiskAdjustedExposure)}**`,
     `- Ampel-Verteilung: ${AMPEL_MARKDOWN["grün"]} **${distribution["grün"]}**, ${AMPEL_MARKDOWN["gelb"]} **${distribution["gelb"]}**, ${AMPEL_MARKDOWN["rot"]} **${distribution["rot"]}**`,
     "",
     ...formatDataSourcesForMarkdown(dataSources),
@@ -119,19 +130,20 @@ export function renderMarkdownReport(
     `- Sanktions-Exposure: **${formatWeight(config.weights.sanktions_exposure)}**`,
     `- Handels-Exposure: **${formatWeight(config.weights.handels_exposure)}**`,
     "- Top-Treiber werden nach **gewichteter Score-Beitrag** sortiert, nicht nach Rohwert.",
+    "- Risiko-adjustiertes Exposure = **Handelsvolumen × Risiko-Score / 100**.",
     `- Rot ab Score **${config.thresholds.redScore}** oder Sanktions-Exposure ab **${config.thresholds.sanctionsHardStop}**`,
     `- Gelb ab Score **${config.thresholds.yellowScore}**`,
     "",
     "## Risiko-Ranking",
     "",
-    "| Rang | ID | Ampel | Score | Lieferant | Land | Branche | Handelsvolumen | Top-Treiber (gewichteter Beitrag) |",
-    "|---:|---|---|---:|---|---|---|---:|---|",
+    "| Rang | ID | Ampel | Score | Risiko-adjustiertes Exposure | Lieferant | Land | Branche | Handelsvolumen | Top-Treiber (gewichteter Beitrag) |",
+    "|---:|---|---|---:|---:|---|---|---|---:|---|",
   ];
 
   results.forEach((result, index) => {
     const s = result.supplier;
     lines.push(
-      `| ${index + 1} | ${s.lieferant_id} | ${AMPEL_MARKDOWN[result.ampel]} | ${result.risiko_score.toFixed(1)} | ${escapeMarkdownTable(s.name)} | ${escapeMarkdownTable(s.land_name)} | ${escapeMarkdownTable(s.branche)} | ${formatEuro(s.handelsvolumen_eur_jahr)} | ${formatDriversForTable(result)} |`
+      `| ${index + 1} | ${s.lieferant_id} | ${AMPEL_MARKDOWN[result.ampel]} | ${result.risiko_score.toFixed(1)} | ${formatEuro(result.risk_adjusted_exposure)} | ${escapeMarkdownTable(s.name)} | ${escapeMarkdownTable(s.land_name)} | ${escapeMarkdownTable(s.branche)} | ${formatEuro(s.handelsvolumen_eur_jahr)} | ${formatDriversForTable(result)} |`
     );
   });
 
@@ -147,7 +159,8 @@ export function renderMarkdownReport(
       `**Score:** ${result.risiko_score}/100  `,
       `**Land:** ${s.land_name} (${s.land_iso2})  `,
       `**Branche/Ware:** ${s.branche} / ${s.ware} (HS ${s.hs_code})  `,
-      `**Handelsvolumen:** ${formatEuro(s.handelsvolumen_eur_jahr)}`,
+      `**Handelsvolumen:** ${formatEuro(s.handelsvolumen_eur_jahr)}  `,
+      `**Risiko-adjustiertes Exposure:** ${formatEuro(result.risk_adjusted_exposure)}`,
       "",
       `**Treiber:** ${formatDrivers(result)}`,
       "",

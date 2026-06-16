@@ -2,7 +2,7 @@
 
 Deterministisches TypeScript/Node-CLI für die AI:AT Developer Challenge.
 
-Das Tool liest eine Lieferantenliste aus JSON oder CSV, berechnet pro Lieferant einen erklärbaren Risiko-Score, vergibt eine Ampel und erzeugt einen Portfolio-Report für den First-Pass-Check.
+Das Tool liest eine Lieferantenliste aus JSON oder CSV, berechnet pro Lieferant einen erklärbaren Risiko-Score, vergibt eine Ampel und erzeugt einen Portfolio-Report für den First-Pass-Check. Zusätzlich berechnet es `risk_adjusted_exposure = handelsvolumen_eur_jahr × risiko_score / 100`, damit neben der Risikoklasse auch die betroffene Geschäftsgröße sichtbar wird.
 
 ## Repo-Orientierung
 
@@ -10,8 +10,7 @@ Das Tool liest eine Lieferantenliste aus JSON oder CSV, berechnet pro Lieferant 
 - [dev/Challenge.md](./dev/Challenge.md): originale Developer-Challenge mit Teil A und Teil B.
 - [business/Challenge.md](./business/Challenge.md): originale Business-Challenge, zur Vollständigkeit im Repo behalten.
 - [dev/README.md](./dev/README.md): Developer-Notizen, Design-Entscheidungen, Scoring, Live-API- und LLM-Details.
-- [dev/WALKTHROUGH_NOTES.md](./dev/WALKTHROUGH_NOTES.md): kurze Notiz für die Demo-/Walkthrough-Vorbereitung.
-- [dev/code-review/REVIEW.md](./dev/code-review/REVIEW.md): Antwort auf Teil B der Developer-Challenge.
+- [dev/code-review/REVIEW.md](./dev/code-review/REVIEW.md): **Antwort auf Teil B** der Developer-Challenge.
 - [business/NOTES.md](./business/NOTES.md): erste knappe Notizen für den Business-Teil.
 - [DECISION_LOG.md](./DECISION_LOG.md): Entscheidungen, Trade-offs und Schlüssel-Prompts.
 - [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md): Hinweise zu übernommenen Drittanbieter-Dateien.
@@ -36,6 +35,27 @@ In CI oder bei frischem Checkout kann auch der Lockfile-basierte Install genutzt
 ```bash
 npm ci
 ```
+
+## Lokale Konfiguration
+
+Die getrackten Defaults liegen in [src/config.ts](./src/config.ts). Persönliche LLM-Einstellungen können lokal in `src/config.local.json` überschrieben werden; diese Datei ist in `.gitignore` und wird nicht committed.
+
+```bash
+cp src/config.local.example.json src/config.local.json
+```
+
+In `src/config.local.json` können z. B. Ollama-Base-URL und Modell gesetzt werden:
+
+```json
+{
+  "llm": {
+    "baseUrl": "http://localhost:11434",
+    "model": ""
+  }
+}
+```
+
+Wenn `model` leer bleibt und `--llm` genutzt wird, versucht das Tool `ollama list` und fragt interaktiv nach einem installierten Modell. Ein per `--llm-model` gewähltes Modell wird für Folgeruns in `src/config.local.json` gespeichert.
 
 ## Schnellstart
 
@@ -88,13 +108,16 @@ npm start -- --alerts --no-console --no-markdown
 # Optionale Live-Daten nutzen
 npm start -- --live
 
-# Optional lokale Ollama-Texte erzeugen
-npm start -- --llm --llm-model qwen3:14b
+# Optional lokale Ollama-Texte erzeugen, es wird nach einem laufenden Ollama gesucht und die Auswahl gepromptet
+npm start -- --llm
 ```
 
 Weitere nützliche Run-Beispiele:
 
 ```bash
+# Optional lokale Ollama-Texte erzeugen und ein bestimmtes Modell auswählen
+npm start -- --llm --llm-model qwen3:14b
+
 # Markdown schreiben, aber nichts ins Terminal drucken
 npm start -- --no-console
 
@@ -170,8 +193,8 @@ CI ist unter [.github/workflows/ci.yml](./.github/workflows/ci.yml) eingerichtet
 ├── Challenge.md
 ├── README.md
 ├── DECISION_LOG.md
-├── THIRD_PARTY_NOTICES.md
 ├── SELF_REPORT.md
+├── THIRD_PARTY_NOTICES.md
 ├── data/
 │   ├── README.md
 │   ├── suppliers.json
@@ -187,6 +210,7 @@ CI ist unter [.github/workflows/ci.yml](./.github/workflows/ci.yml) eingerichtet
     ├── index.ts
     ├── cli.ts
     ├── config.ts
+    ├── config.local.example.json
     ├── scoring.ts
     ├── report.ts
     ├── worldBankWgi.ts
@@ -199,6 +223,5 @@ CI ist unter [.github/workflows/ci.yml](./.github/workflows/ci.yml) eingerichtet
 
 - Der Default-Lauf ist deterministisch und braucht keinen API-Key.
 - `--live` und `--llm` sind optionale Stretch-Modi mit Fallbacks.
-- Die Daten sind synthetisch und vereinfacht.
 - Das Ergebnis ist ein First-Pass-Screening, keine rechts- oder compliance-sichere CSDDD-Auskunft.
 - Details zu Scoring, Datenqualität, Entscheidungen und nicht implementierten Stretch-Goals stehen in [dev/README.md](./dev/README.md).

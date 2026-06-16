@@ -200,7 +200,7 @@ async function resolveOllamaModel(
     models = await listInstalledOllamaModels(dependencies.execFile);
   } catch (error) {
     throw new Error(
-      `No Ollama model configured and "ollama list" failed. Pass --llm-model or set DEFAULT_LLM_CONFIG.model in src/config.ts. ${formatErrorMessage(error)}`
+      `No Ollama model configured and "ollama list" failed. Pass --llm-model or set llm.model in src/config.local.json. ${formatErrorMessage(error)}`
     );
   }
 
@@ -389,6 +389,7 @@ function toPromptSupplierSummary(result: RiskResult) {
     ware: result.supplier.ware,
     handelsvolumen_eur_jahr: result.supplier.handelsvolumen_eur_jahr,
     risiko_score: result.risiko_score,
+    risk_adjusted_exposure: result.risk_adjusted_exposure,
     ampel: result.ampel,
     top_treiber: result.treiber.map((driver) => ({
       name: driver.label,

@@ -253,7 +253,6 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
 
 /** Reads selected npm_config_* values so common `npm start --flag` mistakes still work. */
 function applyNpmConfigArgs(options: CliOptions, env: NodeJS.ProcessEnv): void {
-  // Supports common npm usage mistakes like `npm start --no-markdown`.
   // The preferred form is still `npm start -- --no-markdown`.
   const markdown = readNpmBoolean(env, "npm_config_markdown");
   const consoleOutput = readNpmBoolean(env, "npm_config_console");

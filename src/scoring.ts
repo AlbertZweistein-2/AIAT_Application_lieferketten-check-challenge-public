@@ -21,7 +21,11 @@ export function assessSuppliers(suppliers: Supplier[], config: RiskConfig): Risk
 
   return suppliers
     .map((supplier) => assessSupplier(supplier, config, imputationContext))
-    .sort((a, b) => b.risiko_score - a.risiko_score);
+    .sort(
+      (a, b) =>
+        b.risiko_score - a.risiko_score ||
+        b.risk_adjusted_exposure - a.risk_adjusted_exposure
+    );
 }
 
 /** Scores one supplier, including imputation, forced ampels, reasoning and recommendation text. */
@@ -35,6 +39,9 @@ export function assessSupplier(
   const drivers = getRiskDrivers(dim, config);
   const weightedScore = drivers.reduce((sum, driver) => sum + driver.contribution, 0);
   const risiko_score = round1(weightedScore);
+  const risk_adjusted_exposure = roundEuro(
+    supplier.handelsvolumen_eur_jahr * (risiko_score / 100)
+  );
   const tradeExposureAmpel = getTradeExposureMinimumAmpel(dim.handels_exposure, config);
   const forcedAmpel = strongestForcedAmpel(normalized.forcedAmpel, tradeExposureAmpel);
   const ampel = applyForcedAmpel(classifyRisk(risiko_score, dim, config), forcedAmpel);
@@ -60,6 +67,7 @@ export function assessSupplier(
   return {
     supplier: scoredSupplier,
     risiko_score,
+    risk_adjusted_exposure,
     ampel,
     treiber,
     begruendung,
@@ -91,6 +99,7 @@ export function classifyRisk(
 
 type ImputationContext = {
   countryMedians: Map<string, Partial<Record<RiskDimensionKey, number>>>;
+  countryHsTradeMedians: Map<string, number>;
 };
 
 type NormalizedRiskDimensions = {
@@ -101,6 +110,8 @@ type NormalizedRiskDimensions = {
 
 function createImputationContext(suppliers: Supplier[]): ImputationContext {
   const countryValues = new Map<string, Record<RiskDimensionKey, number[]>>();
+  const countryHsTradeValues = new Map<string, number[]>();
+
   for (const supplier of suppliers) {
     const valuesForCountry =
       countryValues.get(supplier.land_iso2) ??
@@ -118,10 +129,20 @@ function createImputationContext(suppliers: Supplier[]): ImputationContext {
       }
     }
 
+    const tradeExposure = supplier.risiko_dimensionen.handels_exposure;
+
+    if (isRiskNumber(tradeExposure)) {
+      const tradeKey = createCountryHsKey(supplier.land_iso2, supplier.hs_code);
+      const tradeValues = countryHsTradeValues.get(tradeKey) ?? [];
+      tradeValues.push(tradeExposure);
+      countryHsTradeValues.set(tradeKey, tradeValues);
+    }
+
     countryValues.set(supplier.land_iso2, valuesForCountry);
   }
 
   const countryMedians = new Map<string, Partial<Record<RiskDimensionKey, number>>>();
+  const countryHsTradeMedians = new Map<string, number>();
 
   for (const [country, values] of countryValues.entries()) {
     countryMedians.set(country, {
@@ -131,7 +152,15 @@ function createImputationContext(suppliers: Supplier[]): ImputationContext {
     });
   }
 
-  return { countryMedians };
+  for (const [countryHsKey, values] of countryHsTradeValues.entries()) {
+    const tradeMedian = median(values);
+
+    if (tradeMedian !== undefined) {
+      countryHsTradeMedians.set(countryHsKey, tradeMedian);
+    }
+  }
+
+  return { countryMedians, countryHsTradeMedians };
 }
 
 /** Normalizes missing/invalid dimensions and records any data-quality notes for the report. */
@@ -170,13 +199,29 @@ function normalizeRiskDimensions(
   let forceMinimumYellowForMissingTrade = false;
 
   for (const key of missingKeys) {
+    if (key === "handels_exposure") {
+      const countryHsMedian = context.countryHsTradeMedians.get(
+        createCountryHsKey(supplier.land_iso2, supplier.hs_code)
+      );
+
+      if (countryHsMedian !== undefined) {
+        dimensions[key] = countryHsMedian;
+        notes.push(
+          `${RISK_DIMENSION_LABELS[key]} fehlte und wurde mit dem Median für ${supplier.land_name} und HS ${supplier.hs_code} (${countryHsMedian}/100) imputiert.`
+        );
+        continue;
+      }
+    }
+
     const countryMedian = context.countryMedians.get(supplier.land_iso2)?.[key];
 
     if (countryMedian !== undefined) {
       dimensions[key] = countryMedian;
-      notes.push(
-        `${RISK_DIMENSION_LABELS[key]} fehlte und wurde mit dem Länder-Median für ${supplier.land_name} (${countryMedian}/100) imputiert.`
-      );
+      const fallbackText =
+        key === "handels_exposure"
+          ? `${RISK_DIMENSION_LABELS[key]} fehlte; kein Peer mit gleichem Land und HS ${supplier.hs_code} verfügbar. Als Fallback wurde der Länder-Median für ${supplier.land_name} (${countryMedian}/100) imputiert.`
+          : `${RISK_DIMENSION_LABELS[key]} fehlte und wurde mit dem Länder-Median für ${supplier.land_name} (${countryMedian}/100) imputiert.`;
+      notes.push(fallbackText);
       continue;
     }
 
@@ -199,6 +244,10 @@ function normalizeRiskDimensions(
     notes,
     forcedAmpel: forceMinimumYellowForMissingTrade ? "gelb" : undefined,
   };
+}
+
+function createCountryHsKey(countryIso2: string, hsCode: string): string {
+  return `${countryIso2}::${hsCode}`;
 }
 
 function isRiskNumber(value: Supplier["risiko_dimensionen"][RiskDimensionKey]): value is number {
@@ -368,4 +417,8 @@ function median(values: number[]): number | undefined {
 
 function round1(value: number): number {
   return Math.round(value * 10) / 10;
+}
+
+function roundEuro(value: number): number {
+  return Math.round(value);
 }

@@ -10,6 +10,7 @@ export type SupplierAlert = {
   branche: string;
   ampel: TrafficLight;
   risiko_score: number;
+  risk_adjusted_exposure: number;
   top_treiber: Array<{
     key: string;
     label: string;
@@ -64,6 +65,7 @@ function toSupplierAlert(result: RiskResult): SupplierAlert {
     branche: supplier.branche,
     ampel: result.ampel,
     risiko_score: result.risiko_score,
+    risk_adjusted_exposure: result.risk_adjusted_exposure,
     top_treiber: result.treiber.map((driver) => ({
       key: driver.key,
       label: driver.label,

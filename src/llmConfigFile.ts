@@ -1,8 +1,15 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import type { LlmConfig } from "./types";
 
-const DEFAULT_CONFIG_PATH = "src/config.ts";
+const DEFAULT_CONFIG_PATH = "src/config.local.json";
 
-/** Persists the selected Ollama model in DEFAULT_LLM_CONFIG for later CLI runs. */
+type LocalConfigFile = {
+  llm?: Partial<Omit<LlmConfig, "prompts">> & {
+    prompts?: Partial<LlmConfig["prompts"]>;
+  };
+};
+
+/** Persists the selected Ollama model in the local gitignored config for later CLI runs. */
 export function persistDefaultLlmModel(
   model: string,
   configPath = DEFAULT_CONFIG_PATH
@@ -13,39 +20,31 @@ export function persistDefaultLlmModel(
     return false;
   }
 
-  const source = readFileSync(configPath, "utf-8");
-  const updated = updateDefaultLlmModelSource(source, trimmedModel);
+  const source = existsSync(configPath) ? readFileSync(configPath, "utf-8") : "{}\n";
+  const currentConfig = parseLocalConfigSource(source);
 
-  if (updated === source) {
+  if (currentConfig.llm?.model === trimmedModel) {
     return false;
   }
 
+  const updated = updateLocalLlmModelSource(source, trimmedModel);
   writeFileSync(configPath, updated, "utf-8");
   return true;
 }
 
-/** Rewrites only the DEFAULT_LLM_CONFIG model line while preserving the rest of config.ts. */
-export function updateDefaultLlmModelSource(source: string, model: string): string {
-  const blockMatch = source.match(
-    /export const DEFAULT_LLM_CONFIG: LlmConfig = \{[\s\S]*?\n\};/
-  );
+/** Rewrites only llm.model in the local JSON config while preserving other keys. */
+export function updateLocalLlmModelSource(source: string, model: string): string {
+  const config = parseLocalConfigSource(source);
 
-  if (!blockMatch) {
-    throw new Error("Could not find DEFAULT_LLM_CONFIG in src/config.ts.");
-  }
+  config.llm = {
+    ...config.llm,
+    model,
+  };
 
-  const block = blockMatch[0];
-  const modelLine = `  model: ${JSON.stringify(model)},`;
-  let updatedBlock: string;
+  return `${JSON.stringify(config, null, 2)}\n`;
+}
 
-  if (/\n\s*model:\s*(?:"[^"]*"|undefined),/.test(block)) {
-    updatedBlock = block.replace(/\n\s*model:\s*(?:"[^"]*"|undefined),/, `\n${modelLine}`);
-  } else {
-    updatedBlock = block.replace(
-      /(\n\s*baseUrl:\s*"[^"]*",)/,
-      `$1\n${modelLine}`
-    );
-  }
-
-  return source.replace(block, updatedBlock);
+function parseLocalConfigSource(source: string): LocalConfigFile {
+  const trimmed = source.trim();
+  return trimmed.length > 0 ? (JSON.parse(trimmed) as LocalConfigFile) : {};
 }
