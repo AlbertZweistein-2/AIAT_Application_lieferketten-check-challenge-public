@@ -13,7 +13,8 @@ Das Tool liest eine Lieferantenliste aus JSON oder CSV, berechnet pro Lieferant 
 - [dev/code-review/REVIEW.md](./dev/code-review/REVIEW.md): **Antwort auf Teil B** der Developer-Challenge.
 - [DECISION_LOG.md](./DECISION_LOG.md): Entscheidungen, Trade-offs und Schlüssel-Prompts.
 - [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md): Hinweise zu übernommenen Drittanbieter-Dateien.
-- [SELF_REPORT.md](./SELF_REPORT.md): Vorlage für den finalen Selbst-Report.
+- [SELF_REPORT.md](./SELF_REPORT.md): Selbst-Report über den Arbeitsaufwand.
+- The Walkthrough video, which does not include the stretch functionalities, can be found at this [OneDrive Link](https://1drv.ms/v/c/159791A6E7F71885/IQBUv78WBT5eS4OmdlLYEK-pAYXh_BiBZJQ7k9I1uHrX1Yc?e=wc3C9p).
 
 Die Challenge-Instruktionen wurden bewusst in den [Challenge.md](./Challenge.md)-Dateien behalten, damit Aufgabenstellung und Lösung im Repo getrennt nachvollziehbar bleiben.
 
