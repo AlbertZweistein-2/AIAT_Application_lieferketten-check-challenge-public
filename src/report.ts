@@ -24,6 +24,7 @@ export type ReportPaths = {
   portfolioBrief?: string;
 };
 
+/** Prints the portfolio summary, ranking and supplier details to the terminal. */
 export function printPortfolioReport(results: RiskResult[], reportPaths: ReportPaths = {}): void {
   const distribution = countTrafficLights(results);
   const color = createTerminalStyler();
@@ -86,6 +87,7 @@ export function printPortfolioReport(results: RiskResult[], reportPaths: ReportP
   }
 }
 
+/** Renders the full Markdown report, including optional live-source and LLM brief sections. */
 export function renderMarkdownReport(
   results: RiskResult[],
   config: RiskConfig,
@@ -181,6 +183,7 @@ function formatDataSourcesForMarkdown(dataSources: string[]): string[] {
   ];
 }
 
+/** Counts traffic-light classifications for portfolio summaries. */
 export function countTrafficLights(results: RiskResult[]): PortfolioDistribution {
   return results.reduce(
     (acc, result) => {
@@ -219,6 +222,7 @@ function formatDataQualityForMarkdown(result: RiskResult): string[] {
   ];
 }
 
+/** Creates terminal color helpers while respecting NO_COLOR and non-TTY output. */
 function createTerminalStyler() {
   const enabled = process.stdout.isTTY && process.env.NO_COLOR === undefined;
 

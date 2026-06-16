@@ -53,6 +53,7 @@ const DEFAULT_EU_SANCTIONS_CACHE_PATH = join(
   "csvFullSanctionsList_1_1.csv"
 );
 
+/** Fetches EU FSF country risks for the countries present in the supplier list. */
 export async function fetchEuSanctionsCountryRisksForSuppliers(
   suppliers: Supplier[],
   options: FetchEuSanctionsOptions = {}
@@ -60,6 +61,7 @@ export async function fetchEuSanctionsCountryRisksForSuppliers(
   return fetchEuSanctionsCountryRisks(getUniqueSupplierCountryCodes(suppliers), options);
 }
 
+/** Loads EU FSF data and computes country-level sanctions exposure values. */
 export async function fetchEuSanctionsCountryRisks(
   countryCodes: string[],
   options: FetchEuSanctionsOptions = {}
@@ -83,6 +85,7 @@ export async function fetchEuSanctionsCountryRisks(
   }));
 }
 
+/** Replaces each supplier's sanctions dimension with the computed EU FSF country proxy. */
 export function applyEuSanctionsCountryRisksToSuppliers(
   suppliers: Supplier[],
   risks: EuSanctionsCountryRisk[]
@@ -110,6 +113,7 @@ export function applyEuSanctionsCountryRisksToSuppliers(
   });
 }
 
+/** Parses the EU FSF CSV and counts unique sanctioned entities by requested country. */
 export function parseEuSanctionsCountryRisks(
   csvText: string,
   countryCodes: string[]
@@ -169,6 +173,7 @@ export function parseEuSanctionsCountryRisks(
   });
 }
 
+/** Finds the current CSV v1.1 download link and publication date in the EU FSF RSS feed. */
 export function parseEuSanctionsRssCsv11Link(rssXml: string): EuSanctionsCsvLink {
   const itemBlocks = rssXml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
 
@@ -194,6 +199,7 @@ export function parseEuSanctionsRssCsv11Link(rssXml: string): EuSanctionsCsvLink
   throw new Error("EU FSF RSS feed did not contain a CSV - v1.1 item.");
 }
 
+/** Formats EU FSF probe results for direct CLI diagnostics. */
 export function formatEuSanctionsCountryRisks(results: EuSanctionsCountryRisk[]): string {
   const lines = [
     "EU FSF sanctions exposure probe",
@@ -211,6 +217,7 @@ export function formatEuSanctionsCountryRisks(results: EuSanctionsCountryRisk[])
   return lines.join("\n");
 }
 
+/** Loads the EU FSF CSV from a fresh cache or downloads and records the current publication. */
 async function loadEuSanctionsCsv(
   options: FetchEuSanctionsOptions
 ): Promise<EuSanctionsCsvSource> {
@@ -407,6 +414,7 @@ function stripBom(value: string): string {
   return value.replace(/^\uFEFF/, "");
 }
 
+/** Converts country entity counts into the conservative median/log exposure score. */
 function calculateMedianLogSanctionsExposure(count: number, medianCount: number): number {
   const score = 25 + 10 * Math.log2((count + 1) / (medianCount + 1));
 

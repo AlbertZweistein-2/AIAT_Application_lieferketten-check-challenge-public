@@ -30,6 +30,7 @@ import {
 import { persistDefaultLlmModel } from "./llmConfigFile";
 import { applyLlmSupplierTexts, generateOllamaReportEnhancement } from "./ollama";
 
+/** Main CLI flow: parse options, optionally enrich live/LLM data, score suppliers and write outputs. */
 async function main(): Promise<void> {
   const options = parseCliArgs(process.argv.slice(2));
 
@@ -91,7 +92,7 @@ async function main(): Promise<void> {
   };
   let suppliers = loadSuppliers(options.inputPath);
   const dataSourceNotes = options.live
-    ? ["Live-Modus: Seed-Werte bleiben Fallback, wenn ein Live-API-Schritt fehlschlaegt."]
+    ? ["Live-Modus: Seed-Werte bleiben Fallback, wenn ein Live-API-Schritt fehlschlägt."]
     : ["Seed: alle Risiko-Dimensionen stammen aus der Eingabedatei."];
 
   if (options.live) {
@@ -127,7 +128,7 @@ async function main(): Promise<void> {
       );
       suppliers = applyEuSanctionsCountryRisksToSuppliers(suppliers, euSanctionsRisks);
       dataSourceNotes.push(
-        "Sanktions-Exposure: live aus EU FSF als Laender-Proxy (median/log-kalibrierte Entity-Counts)."
+        "Sanktions-Exposure: live aus EU FSF als Länder-Proxy (median/log-kalibrierte Entity-Counts)."
       );
     } catch (error) {
       const message = formatErrorMessage(error);
@@ -260,6 +261,7 @@ function logLlm(message: string): void {
   console.error(`[llm] ${message}`);
 }
 
+/** Persists the selected Ollama model as a convenience default, but never blocks the report. */
 function persistLlmModelForNextRuns(model: string): void {
   try {
     if (persistDefaultLlmModel(model)) {

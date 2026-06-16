@@ -1,3 +1,4 @@
+// End-to-end CLI and scoring regression tests for the deterministic seed workflow.
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

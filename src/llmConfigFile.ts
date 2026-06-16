@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const DEFAULT_CONFIG_PATH = "src/config.ts";
 
+/** Persists the selected Ollama model in DEFAULT_LLM_CONFIG for later CLI runs. */
 export function persistDefaultLlmModel(
   model: string,
   configPath = DEFAULT_CONFIG_PATH
@@ -23,6 +24,7 @@ export function persistDefaultLlmModel(
   return true;
 }
 
+/** Rewrites only the DEFAULT_LLM_CONFIG model line while preserving the rest of config.ts. */
 export function updateDefaultLlmModelSource(source: string, model: string): string {
   const blockMatch = source.match(
     /export const DEFAULT_LLM_CONFIG: LlmConfig = \{[\s\S]*?\n\};/

@@ -16,6 +16,7 @@ const MISSING_RISK_MARKERS = new Set([
   "--",
 ]);
 
+/** Validates raw supplier input and normalizes risk dimensions for scoring. */
 export function validateSupplier(value: unknown, index: number): Supplier {
   if (!isObject(value)) {
     throw new Error(`Supplier at index ${index} is not an object.`);
@@ -64,6 +65,7 @@ export function validateSupplier(value: unknown, index: number): Supplier {
   } as Supplier;
 }
 
+/** Converts missing markers and numeric strings while preserving invalid values for later escalation. */
 function normalizeRiskDimension(value: unknown): RiskDimensionValue | undefined {
   if (value === undefined || value === null) {
     return undefined;

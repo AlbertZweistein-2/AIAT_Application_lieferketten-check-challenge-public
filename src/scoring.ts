@@ -15,6 +15,7 @@ const RISK_DIMENSIONS: RiskDimensionKey[] = [
   "handels_exposure",
 ];
 
+/** Scores all suppliers and returns them sorted from highest to lowest risk. */
 export function assessSuppliers(suppliers: Supplier[], config: RiskConfig): RiskResult[] {
   const imputationContext = createImputationContext(suppliers);
 
@@ -23,6 +24,7 @@ export function assessSuppliers(suppliers: Supplier[], config: RiskConfig): Risk
     .sort((a, b) => b.risiko_score - a.risiko_score);
 }
 
+/** Scores one supplier, including imputation, forced ampels, reasoning and recommendation text. */
 export function assessSupplier(
   supplier: Supplier,
   config: RiskConfig,
@@ -66,6 +68,7 @@ export function assessSupplier(
   };
 }
 
+/** Classifies the weighted score into a traffic light, with sanctions as a hard-stop override. */
 export function classifyRisk(
   score: number,
   dim: CompleteRiskDimensions,
@@ -131,6 +134,7 @@ function createImputationContext(suppliers: Supplier[]): ImputationContext {
   return { countryMedians };
 }
 
+/** Normalizes missing/invalid dimensions and records any data-quality notes for the report. */
 function normalizeRiskDimensions(
   supplier: Supplier,
   context: ImputationContext
@@ -224,6 +228,7 @@ function createForcedRedResult(notes: string[]): NormalizedRiskDimensions {
   };
 }
 
+/** Applies conservative minimum ampels without lowering a worse calculated result. */
 function applyForcedAmpel(calculated: TrafficLight, forced: TrafficLight | undefined): TrafficLight {
   if (!forced) {
     return calculated;
@@ -260,6 +265,7 @@ function getTradeExposureMinimumAmpel(
   return value >= config.thresholds.tradeExposureMinimumYellow ? "gelb" : undefined;
 }
 
+/** Computes each dimension's weighted contribution and orders drivers by actual score impact. */
 function getRiskDrivers(dim: CompleteRiskDimensions, config: RiskConfig): RiskDriver[] {
   return RISK_DIMENSIONS.map((key) => {
     const value = dim[key];
@@ -275,6 +281,7 @@ function getRiskDrivers(dim: CompleteRiskDimensions, config: RiskConfig): RiskDr
   }).sort((a, b) => b.contribution - a.contribution);
 }
 
+/** Produces the deterministic supplier explanation used when no LLM text is applied. */
 function generateReasoning(
   supplier: Supplier,
   score: number,
@@ -298,6 +305,7 @@ function generateReasoning(
   return `${supplier.name} zeigt im First-Pass ein niedriges Risikoprofil. Die wichtigsten Treiber sind ${driverText}, liegen aber insgesamt unterhalb der Eskalationsschwellen.`;
 }
 
+/** Produces the deterministic next-action recommendation for the supplier. */
 function generateRecommendation(
   ampel: TrafficLight,
   dim: CompleteRiskDimensions,

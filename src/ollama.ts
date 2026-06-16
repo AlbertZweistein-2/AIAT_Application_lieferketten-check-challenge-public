@@ -78,6 +78,7 @@ const AI_GENERATED_MARKER = " (AI generated)";
 
 const execFileAsync = promisify(execFile) as ExecFileLike;
 
+/** Generates the optional Ollama portfolio brief and batched supplier explanation texts. */
 export async function generateOllamaReportEnhancement(
   results: RiskResult[],
   config: LlmConfig,
@@ -132,6 +133,7 @@ export async function generateOllamaReportEnhancement(
   };
 }
 
+/** Replaces rule-based supplier texts with available LLM texts, leaving missing batches untouched. */
 export function applyLlmSupplierTexts(
   results: RiskResult[],
   enhancement: LlmReportEnhancement
@@ -151,6 +153,7 @@ export function applyLlmSupplierTexts(
   });
 }
 
+/** Parses `ollama list` output into installed model names. */
 export function parseOllamaListOutput(output: string): string[] {
   return output
     .split(/\r?\n/)
@@ -160,6 +163,7 @@ export function parseOllamaListOutput(output: string): string[] {
     .filter((name) => name.length > 0);
 }
 
+/** Extracts a JSON object from model output, tolerating thinking tags and fenced JSON. */
 export function parseJsonObjectFromModelOutput<T>(content: string): T {
   const withoutThinking = content.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
   const withoutFence = withoutThinking
@@ -181,6 +185,7 @@ export function parseJsonObjectFromModelOutput<T>(content: string): T {
   }
 }
 
+/** Chooses the configured model or asks the user to pick from installed Ollama models. */
 async function resolveOllamaModel(
   config: LlmConfig,
   dependencies: OllamaDependencies
@@ -280,6 +285,7 @@ async function requestPortfolioBrief(
   return markAiGenerated(cleanModelText(response.portfolio_brief));
 }
 
+/** Requests generated text for a small supplier batch using Ollama structured outputs. */
 async function requestSupplierTextBatch(
   results: RiskResult[],
   config: LlmConfig,
@@ -311,6 +317,7 @@ async function requestSupplierTextBatch(
   return response;
 }
 
+/** Calls Ollama's chat API with a JSON schema and returns the parsed content object. */
 async function callOllamaJson<T>(
   config: LlmConfig,
   model: string,

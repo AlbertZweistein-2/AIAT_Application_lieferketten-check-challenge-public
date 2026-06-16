@@ -90,6 +90,7 @@ const DEFAULT_REQUEST_SPACING_MS = 1100;
 const DEFAULT_REQUEST_TIMEOUT_MS = 15000;
 const DEFAULT_RETRY_DELAY_MS = 1200;
 
+/** Fetches one import-exposure result for a reporter/partner/HS query. */
 export async function fetchComtradeImportExposure(
   query: ComtradeExposureQuery,
   options: FetchComtradePreviewOptions = {}
@@ -104,6 +105,7 @@ export async function fetchComtradeImportExposure(
   return result;
 }
 
+/** Fetches deduplicated Comtrade exposures, caching world totals shared across partner queries. */
 export async function fetchComtradeImportExposures(
   queries: ComtradeExposureQuery[],
   options: FetchComtradePreviewOptions = {}
@@ -196,6 +198,7 @@ export async function fetchComtradeImportExposures(
   });
 }
 
+/** Builds and fetches unique Comtrade exposure queries for the supplier list. */
 export async function fetchComtradeImportExposuresForSuppliers(
   suppliers: Supplier[],
   options: FetchSupplierComtradeExposureOptions = {}
@@ -206,6 +209,7 @@ export async function fetchComtradeImportExposuresForSuppliers(
   );
 }
 
+/** Replaces each supplier's trade dimension with the fetched Comtrade import-share proxy. */
 export function applyComtradeImportExposuresToSuppliers(
   suppliers: Supplier[],
   exposures: ComtradeExposureResult[]
@@ -238,6 +242,7 @@ export function applyComtradeImportExposuresToSuppliers(
   });
 }
 
+/** Parses `--comtrade-probe reporter,partner,hs` into a typed query. */
 export function parseComtradeProbeValue(value: string): ComtradeProbeInput {
   const parts = value
     .split(/[,:;]/)
@@ -265,6 +270,7 @@ export function parseComtradeProbeValue(value: string): ComtradeProbeInput {
   };
 }
 
+/** Formats a Comtrade probe result for direct CLI diagnostics. */
 export function formatComtradeImportExposure(result: ComtradeExposureResult): string {
   return [
     "UN Comtrade Preview import exposure probe",
@@ -283,6 +289,7 @@ export function formatComtradeImportExposure(result: ComtradeExposureResult): st
   ].join("\n");
 }
 
+/** Deduplicates suppliers by partner country and HS code before live lookup. */
 function getUniqueSupplierExposureQueries(
   suppliers: Supplier[],
   options: FetchSupplierComtradeExposureOptions
@@ -313,6 +320,7 @@ function getUniqueSupplierExposureQueries(
   return queries;
 }
 
+/** Converts preview rows into the local trade exposure score. */
 function buildExposureResult(
   query: ComtradeExposureQuery,
   flowCode: "M" | "X",
@@ -344,6 +352,7 @@ function buildExposureResult(
   };
 }
 
+/** Removes duplicate reporter/partner/HS/year/flow requests. */
 function dedupeExposureQueries(queries: ComtradeExposureQuery[]): ComtradeExposureQuery[] {
   const seen = new Set<string>();
   const uniqueQueries: ComtradeExposureQuery[] = [];
@@ -365,6 +374,7 @@ function dedupeExposureQueries(queries: ComtradeExposureQuery[]): ComtradeExposu
   return uniqueQueries;
 }
 
+/** Calls the public Comtrade Preview endpoint with timeout and 429 retry handling. */
 async function fetchPreviewRows(
   query: Required<ComtradeExposureQuery>,
   options: Required<Pick<FetchComtradePreviewOptions, "fetch">> &
@@ -485,6 +495,7 @@ function createSupplierExposureKey(partnerCode: number, cmdCode: string): string
   return `${partnerCode}:${cmdCode}`;
 }
 
+/** Runs async work with a small concurrency limit to avoid API bursts. */
 async function mapWithConcurrency<Input, Output>(
   items: Input[],
   concurrency: number,
@@ -521,6 +532,7 @@ function normalizeConcurrency(value: number | undefined): number {
   return Math.max(1, Math.min(10, Math.floor(value)));
 }
 
+/** Creates a shared request spacer across concurrent workers. */
 function createRequestScheduler(spacingMs: number): () => Promise<void> {
   let nextRequestAt = 0;
 

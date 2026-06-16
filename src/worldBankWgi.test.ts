@@ -1,3 +1,4 @@
+// Unit tests for World Bank WGI country normalization, fetching and supplier application.
 import { describe, expect, it } from "vitest";
 import {
   WGI_GOVERNANCE_INDICATORS,

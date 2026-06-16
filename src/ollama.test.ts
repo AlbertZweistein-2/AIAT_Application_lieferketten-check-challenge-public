@@ -1,3 +1,4 @@
+// Unit tests for Ollama model discovery, structured output parsing and text application.
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CONFIG, DEFAULT_LLM_CONFIG } from "./config";
 import {
@@ -46,7 +47,7 @@ describe("Ollama report enrichment", () => {
             supplier_texts: [
               {
                 lieferant_id: "LLM-001",
-                begruendung: "LLM-Begruendung auf Basis der roten Ampel.",
+                begruendung: "LLM-Begründung auf Basis der roten Ampel.",
                 handlungsempfehlung: "LLM-Empfehlung: sofort eskalieren.",
               },
             ],
@@ -88,7 +89,7 @@ describe("Ollama report enrichment", () => {
     expect(requestBodies[0].options).toMatchObject({ temperature: 0 });
     expect(enhancedResults[0].risiko_score).toBe(originalScore);
     expect(enhancedResults[0].begruendung).toBe(
-      "LLM-Begruendung auf Basis der roten Ampel. (AI generated)"
+      "LLM-Begründung auf Basis der roten Ampel. (AI generated)"
     );
     expect(enhancedResults[0].handlungsempfehlung).toBe(
       "LLM-Empfehlung: sofort eskalieren. (AI generated)"

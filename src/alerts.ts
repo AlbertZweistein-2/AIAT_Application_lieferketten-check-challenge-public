@@ -34,6 +34,7 @@ const TRAFFIC_LIGHT_RANK: Record<TrafficLight, number> = {
   rot: 2,
 };
 
+/** Builds the compact alert export for suppliers at or above the selected traffic-light threshold. */
 export function createAlertReport(
   results: RiskResult[],
   threshold: AlertThreshold,
@@ -51,6 +52,7 @@ export function createAlertReport(
   };
 }
 
+/** Converts a full scoring result into the smaller downstream alert payload. */
 function toSupplierAlert(result: RiskResult): SupplierAlert {
   const supplier = result.supplier;
 

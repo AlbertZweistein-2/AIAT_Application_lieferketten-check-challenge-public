@@ -1,3 +1,4 @@
+// Unit tests for UN Comtrade Preview parsing, batching and supplier trade exposure application.
 import { describe, expect, it } from "vitest";
 import {
   applyComtradeImportExposuresToSuppliers,

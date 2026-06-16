@@ -1,3 +1,4 @@
+// Unit tests for EU FSF RSS parsing, CSV parsing, cache freshness and supplier application.
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

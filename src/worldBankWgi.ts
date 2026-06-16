@@ -107,6 +107,7 @@ const WGI_GOVERNANCE_PROXY_WEIGHTS: Record<WgiGovernanceIndicatorId, number> = {
   "GOV_WGI_CC.SC": 0.4,
 };
 
+/** Fetches WGI indicators and converts the governance proxy into local risk values. */
 export async function fetchWorldBankWgiGovernanceRisks(
   countryCodes: string[],
   options: FetchWorldBankWgiOptions = {}
@@ -135,10 +136,12 @@ export async function fetchWorldBankWgiGovernanceRisks(
   return buildGovernanceRisks(normalizedCountries, fetchResults);
 }
 
+/** Returns unique supplier country codes for batched WGI lookup. */
 export function getUniqueSupplierCountryCodes(suppliers: Supplier[]): string[] {
   return Array.from(new Set(suppliers.map((supplier) => supplier.land_iso2)));
 }
 
+/** Replaces each supplier's governance dimension with the fetched WGI risk. */
 export function applyWgiGovernanceRisksToSuppliers(
   suppliers: Supplier[],
   risks: WgiGovernanceRisk[]
@@ -172,6 +175,7 @@ export function applyWgiGovernanceRisksToSuppliers(
   });
 }
 
+/** Formats WGI probe results for direct CLI diagnostics. */
 export function formatWgiGovernanceRisks(results: WgiGovernanceRisk[]): string {
   const lines = [
     "World Bank WGI governance risk probe",
@@ -194,6 +198,7 @@ export function formatWgiGovernanceRisks(results: WgiGovernanceRisk[]): string {
   return lines.join("\n");
 }
 
+/** Accepts ISO2 or ISO3 input, resolves ISO2 to ISO3, and removes duplicates. */
 export function normalizeCountryCodes(countryCodes: string[]): NormalizedCountryCode[] {
   const seen = new Set<string>();
   const normalized: NormalizedCountryCode[] = [];
@@ -229,6 +234,7 @@ export function normalizeCountryCodes(countryCodes: string[]): NormalizedCountry
   return normalized;
 }
 
+/** Fetches one WGI indicator for all requested countries in one World Bank call. */
 async function fetchIndicatorScores(
   indicatorId: WgiGovernanceIndicatorId,
   countries: NormalizedCountryCode[],
@@ -286,6 +292,7 @@ async function fetchIndicatorScores(
   };
 }
 
+/** Combines indicator rows into one governance-risk result per country. */
 function buildGovernanceRisks(
   countries: NormalizedCountryCode[],
   indicatorResults: IndicatorFetchResult[]

@@ -33,6 +33,7 @@ export type CliOptions = {
   llmTimeoutMs: number;
 };
 
+/** Parses CLI flags and npm-provided options into one validated runtime configuration. */
 export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.env): CliOptions {
   const options: CliOptions = {
     inputPath: DEFAULT_INPUT_PATH,
@@ -250,6 +251,7 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
   return options;
 }
 
+/** Reads selected npm_config_* values so common `npm start --flag` mistakes still work. */
 function applyNpmConfigArgs(options: CliOptions, env: NodeJS.ProcessEnv): void {
   // Supports common npm usage mistakes like `npm start --no-markdown`.
   // The preferred form is still `npm start -- --no-markdown`.
@@ -410,6 +412,7 @@ function readLlmBackend(value: string, optionName: string): "ollama" {
   throw new Error(`Invalid value for ${optionName}. Only "ollama" is supported.`);
 }
 
+/** Renders the built-in CLI help text shown by `--help` and parse errors. */
 export function getUsageText(): string {
   return [
     "Usage:",

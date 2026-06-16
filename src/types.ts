@@ -1,3 +1,4 @@
+// Shared domain types for supplier input, scoring output and report rendering.
 export type TrafficLight = "grün" | "gelb" | "rot";
 
 export type RiskDimensionKey =

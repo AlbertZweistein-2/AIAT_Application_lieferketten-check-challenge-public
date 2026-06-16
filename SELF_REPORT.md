@@ -1,8 +1,8 @@
 # Self Report
 
-[Zurueck zum Root README](./README.md)
+[Zurück zum Root README](./README.md)
 
-Dieses Dokument ist als Vorlage fuer den finalen Selbst-Report gedacht. Vor Abgabe bitte ausfuellen.
+Dieses Dokument ist als Vorlage für den finalen Selbst-Report gedacht. Vor Abgabe bitte ausfüllen.
 
 ## Investierte Zeit
 
@@ -11,7 +11,7 @@ Dieses Dokument ist als Vorlage fuer den finalen Selbst-Report gedacht. Vor Abga
 
 ## Zeitaufteilung
 
-- Challenge-Verstaendnis und Priorisierung: `TODO`
+- Challenge-Verständnis und Priorisierung: `TODO`
 - Implementierung CLI/Scoring/Reports: `TODO`
 - Tests und Eval-Set: `TODO`
 - Code Review Teil B: `TODO`
@@ -21,8 +21,8 @@ Dieses Dokument ist als Vorlage fuer den finalen Selbst-Report gedacht. Vor Abga
 ## KI-Nutzung
 
 - Genutzte Tools: `TODO: z. B. Codex, ChatGPT, ...`
-- Wichtigste KI-Unterstuetzung: `TODO`
-- Was manuell entschieden/geprueft wurde: `TODO`
+- Wichtigste KI-Unterstützung: `TODO`
+- Was manuell entschieden/geprüft wurde: `TODO`
 
 ## Bewusst geschnitten
 
@@ -35,8 +35,8 @@ Dieses Dokument ist als Vorlage fuer den finalen Selbst-Report gedacht. Vor Abga
 - [ ] Teil B in [dev/code-review/REVIEW.md](./dev/code-review/REVIEW.md) final
 - [ ] [DECISION_LOG.md](./DECISION_LOG.md) final
 - [ ] Loom/Walkthrough aufgenommen oder schriftliches Skript bereit
-- [ ] Tests/Typecheck final ausgefuehrt
-- [ ] Diese Self-Report-Datei final ausgefuellt
+- [ ] Tests/Typecheck final ausgeführt
+- [ ] Diese Self-Report-Datei final ausgefüllt
 
 ## Navigation
 

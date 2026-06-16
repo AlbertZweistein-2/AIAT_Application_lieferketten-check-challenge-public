@@ -4,6 +4,7 @@ import { validateSupplier } from "./validation";
 import type { AlertReport } from "./alerts";
 import type { RiskResult, Supplier } from "./types";
 
+/** Loads and validates suppliers from a supported JSON or CSV input file. */
 export function loadSuppliers(path: string): Supplier[] {
   const extension = extname(path).toLowerCase();
 
@@ -20,6 +21,7 @@ export function loadSuppliers(path: string): Supplier[] {
   throw new Error(`Unsupported input file format "${extension || "unknown"}". Use .json or .csv.`);
 }
 
+/** Parses the canonical JSON supplier array. */
 function loadSuppliersFromJson(raw: string): Supplier[] {
   const parsed: unknown = JSON.parse(raw);
 
@@ -30,6 +32,7 @@ function loadSuppliersFromJson(raw: string): Supplier[] {
   return parsed.map(validateSupplier);
 }
 
+/** Parses the CSV export format and converts it into the shared supplier shape. */
 function loadSuppliersFromCsv(raw: string): Supplier[] {
   const rows = parseCsv(raw.trim());
 
@@ -70,6 +73,7 @@ function loadSuppliersFromCsv(raw: string): Supplier[] {
   });
 }
 
+/** Repairs the optional leading note column when it contains commas. */
 function normalizeCsvRecord(header: string[], record: string[], rowNumber: number): string[] {
   if (record.length === header.length) {
     return record;
@@ -88,6 +92,7 @@ function normalizeCsvRecord(header: string[], record: string[], rowNumber: numbe
   );
 }
 
+/** Parses required numeric CSV fields with row-specific error messages. */
 function parseCsvNumber(value: unknown, field: string, rowNumber: number): number {
   if (typeof value !== "string" || value.trim() === "") {
     throw new Error(`CSV row ${rowNumber}: missing numeric field "${field}".`);
@@ -102,6 +107,7 @@ function parseCsvNumber(value: unknown, field: string, rowNumber: number): numbe
   return parsed;
 }
 
+/** Minimal CSV parser that supports quoted cells and escaped quotes. */
 function parseCsv(raw: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
@@ -152,6 +158,7 @@ function parseCsv(raw: string): string[][] {
   return rows.filter((csvRow) => csvRow.some((value) => value.length > 0));
 }
 
+/** Writes a timestamped Markdown report and returns the generated path. */
 export function writeTimestampedMarkdownReport(
   outputDirectory: string,
   markdown: string,
@@ -167,6 +174,7 @@ export function writeTimestampedMarkdownReport(
   return reportPath;
 }
 
+/** Writes a timestamped JSON scoring report and returns the generated path. */
 export function writeTimestampedJsonReport(
   outputDirectory: string,
   results: RiskResult[],
@@ -182,6 +190,7 @@ export function writeTimestampedJsonReport(
   return reportPath;
 }
 
+/** Writes a timestamped alert report and returns the generated path. */
 export function writeTimestampedAlertReport(
   outputDirectory: string,
   report: AlertReport,
